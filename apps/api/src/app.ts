@@ -1,8 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { auth } from "./lib/auth";
 import { registerRoutes } from "./routes";
 
 const app = new OpenAPIHono();
+app.on(["POST", "GET"], "api/auth/**", (c) => auth.handler(c.req.raw));
 registerRoutes(app);
 app.doc("/openapi.json", {
   openapi: "3.0.0",
@@ -17,7 +19,7 @@ app.get(
   "/docs",
   Scalar({
     url: "/openapi.json",
-    theme: "default",
+    theme: "deepSpace",
   })
 );
 

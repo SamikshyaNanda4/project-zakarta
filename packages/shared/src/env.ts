@@ -1,8 +1,14 @@
+import { config } from "dotenv";
+import { resolve } from "path";
 import { z } from "zod";
+
+// Load .env — try cwd (apps/api) first, then monorepo root
+config({ path: resolve(process.cwd(), ".env") });
+config({ path: resolve(process.cwd(), "../../.env") });
 
 const envSchema = z.object({
   // Database
-  DATABASE_URL: z.url("DATABASE_URL must be a valid URL"),
+  DATABASE_URL: z.string(),
 
   // Server (optional with defaults)
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
