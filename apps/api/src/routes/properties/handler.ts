@@ -1,0 +1,121 @@
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { eq } from "drizzle-orm";
+import { db } from "@/db/db";
+import { property } from "@/db/schema";
+import { auth } from "@/lib/auth";
+import { requireAuth, requireAllowedToPost } from "@/middleware/require-auth";
+import {
+  listPropertiesRoute,
+  getPropertyRoute,
+  createPropertyRoute,
+  getContactRoute,
+} from "./route";
+
+type AppVariables = {
+  Variables: {
+    user: typeof auth.$Infer.Session.user;
+    session: typeof auth.$Infer.Session.session;
+  };
+};
+
+function generateId(): string {
+  return `prop_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`;
+}
+
+export function PropertyRoutes(app: OpenAPIHono) {
+  // GET /properties — public list (no contact)
+  app.openapi(listPropertiesRoute, async (c) => {
+    const rows = await db.query.property.findMany({
+      orderBy: (p, { desc }) => [desc(p.createdAt)],
+    });
+
+    const properties = rows.map((p) => ({
+      id: p.id,
+      name: p.name,
+      bhk: p.bhk,
+      userId: p.userId,
+      createdAt: p.createdAt.toISOString(),
+    }));
+
+    return c.json({ properties, total: properties.length }, 200);
+  });
+
+  // GET /properties/:id — public detail (no contact)
+  app.openapi(getPropertyRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    const row = await db.query.property.findFirst({
+      where: eq(property.id, id),
+    });
+
+    if (!row) {
+      return c.json({ error: "Property not found" }, 404);
+    }
+
+    return c.json(
+      {
+        id: row.id,
+        name: row.name,
+        bhk: row.bhk,
+        userId: row.userId,
+        createdAt: row.createdAt.toISOString(),
+      },
+      200
+    );
+  });
+
+  // POST /properties — protected: auth + allowedToPost
+  const protectedApp = new OpenAPIHono<AppVariables>();
+  protectedApp.use(requireAuth);
+  protectedApp.use(requireAllowedToPost);
+
+  protectedApp.openapi(createPropertyRoute, async (c) => {
+    const user = c.get("user") as typeof auth.$Infer.Session.user;
+    const { name, bhk, contact } = c.req.valid("json");
+
+    const newProperty = {
+      id: generateId(),
+      name,
+      bhk,
+      contact,
+      userId: user.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    await db.insert(property).values(newProperty);
+
+    return c.json(
+      {
+        id: newProperty.id,
+        name: newProperty.name,
+        bhk: newProperty.bhk,
+        userId: newProperty.userId,
+        createdAt: newProperty.createdAt.toISOString(),
+      },
+      201
+    );
+  });
+
+  app.route("/", protectedApp);
+
+  // POST /properties/:id/contact — protected: auth only (not allowedToPost)
+  const contactApp = new OpenAPIHono<AppVariables>();
+  contactApp.use(requireAuth);
+
+  contactApp.openapi(getContactRoute, async (c) => {
+    const { id } = c.req.valid("param");
+
+    const row = await db.query.property.findFirst({
+      where: eq(property.id, id),
+    });
+
+    if (!row) {
+      return c.json({ error: "Property not found" }, 404);
+    }
+
+    // Future: log contact reveal for rate limiting / analytics
+    return c.json({ contact: row.contact }, 200);
+  });
+
+  app.route("/", contactApp);
+}

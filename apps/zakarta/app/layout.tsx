@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { NavbarWrapper } from "@/components/navbar-wrapper";
 
 export const metadata: Metadata = {
-  title: "Zakarta",
-  description: "Zakarta frontend app",
+  title: "Zakarta — Find Your Home",
+  description: "Browse property listings on Zakarta.",
 };
 
 export default function RootLayout({
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="min-h-screen bg-gray-50 antialiased">
+        <NavbarWrapper />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,72 +1,35 @@
-import { Button } from "@repo/ui/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/ui/card"
-import { Input } from "@repo/ui/components/ui/input"
-import { Label } from "@repo/ui/components/ui/label"
-import { APP_NAME } from "@repo/shared"
+import { API_URL } from "@/lib/env";
+import { PropertiesListClient } from "@/components/properties-list-client";
+import type { PropertyListResponse } from "@/lib/api";
 
-export default function Home() {
+// Server component: fetch on every request for fresh listings
+export default async function HomePage() {
+  let data: PropertyListResponse = { properties: [], total: 0 };
+
+  try {
+    const res = await fetch(`${API_URL}/properties`, { cache: "no-store" });
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch {
+    // API unavailable — render empty list gracefully
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-24">
-      <h1 className="text-4xl font-bold">Zakarta</h1>
-      <p className="text-muted-foreground">Welcome to the Zakarta frontend</p>
-      <Button>Get Started</Button><br /><h1>{APP_NAME}</h1><br />
-      <CardDemo/>
+    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          Property Listings
+        </h1>
+        <p className="mt-2 text-base text-gray-500">
+          {data.total > 0
+            ? `${data.total} ${data.total === 1 ? "property" : "properties"} available`
+            : "Browse available properties below."}
+        </p>
+      </div>
+
+      {/* Client component handles session, auth modal, and contact reveal */}
+      <PropertiesListClient initialProperties={data.properties} />
     </main>
   );
-}
-
-
-export function CardDemo() {
-  return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Login to your account</CardTitle>
-        <CardDescription>
-          Enter your email below to login to your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form>
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <a
-                  href="#"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
-              </div>
-              <Input id="password" type="password" required />
-            </div>
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Login
-        </Button>
-        <Button variant="outline" className="w-full">
-          Login with Google
-        </Button>
-      </CardFooter>
-    </Card>
-  )
 }
