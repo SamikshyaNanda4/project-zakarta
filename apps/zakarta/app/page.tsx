@@ -9,13 +9,14 @@ import {
 } from "@repo/ui/components/ui/card"
 import { Input } from "@repo/ui/components/ui/input"
 import { Label } from "@repo/ui/components/ui/label"
+import { APP_NAME } from "@repo/shared"
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-24">
       <h1 className="text-4xl font-bold">Zakarta</h1>
       <p className="text-muted-foreground">Welcome to the Zakarta frontend</p>
-      <Button>Get Started</Button><br /><br />
+      <Button>Get Started</Button><br /><h1>{APP_NAME}</h1><br />
       <CardDemo/>
     </main>
   );

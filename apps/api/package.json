@@ -10,6 +10,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@repo/shared": "workspace:*",
     "@hono/node-server": "^1.14.1",
     "@hono/zod-openapi": "^1.2.4",
     "@scalar/hono-api-reference": "^0.10.6",

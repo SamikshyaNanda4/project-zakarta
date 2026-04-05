@@ -1,6 +1,7 @@
 import { serve } from "@hono/node-server";
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { apiReference } from "@scalar/hono-api-reference";
+import { APP_NAME } from "@repo/shared";
 
 const app = new OpenAPIHono();
 
@@ -100,10 +101,7 @@ app.get(
 );
 
 // --- Server ---
-serve(
-  { fetch: app.fetch, port: 3001 },
-  (info) => {
-    console.log(`API server running at http://localhost:${info.port}`);
-    console.log(`API docs available at http://localhost:${info.port}/docs`);
-  }
-);
+serve({ fetch: app.fetch, port: 3001 }, (info) => {
+  console.log(`${APP_NAME} server running at http://localhost:${info.port}`);
+  console.log(`API docs available at http://localhost:${info.port}/docs`);
+});
