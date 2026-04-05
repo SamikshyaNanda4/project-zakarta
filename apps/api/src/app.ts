@@ -3,9 +3,7 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { registerRoutes } from "./routes";
 
 const app = new OpenAPIHono();
-
 registerRoutes(app);
-
 app.doc("/openapi.json", {
   openapi: "3.0.0",
   info: {
