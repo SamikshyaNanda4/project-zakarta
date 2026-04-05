@@ -2,6 +2,11 @@
   "name": "tbr",
   "private": true,
   "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build",
+    "start": "pnpm run --parallel start",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
