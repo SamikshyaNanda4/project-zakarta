@@ -5,7 +5,8 @@ const envSchema = z.object({
   DATABASE_URL: z.url("DATABASE_URL must be a valid URL"),
 
   // Server (optional with defaults)
-  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  API_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  FRONTEND_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   NODE_ENV: z.enum(["development", "production"]).default("development"),
 
   // Better Auth
