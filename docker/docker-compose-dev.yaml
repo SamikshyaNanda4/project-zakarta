@@ -6,6 +6,6 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: zktuser
       POSTGRES_PASSWORD: zktpassword
-      POSTGRES_DB: zakarta-db
+      POSTGRES_DB: zkt-db
