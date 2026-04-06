@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { API_URL } from "@/lib/env";
 import { PropertyDetailClient } from "@/components/property-detail-client";
-import type { PropertyPublic } from "@/lib/api";
+import type { PropertyPublic } from "@/api";
+import { serverHttp } from "@/api/server";
 
 // Server component: fetches property data, delegates contact reveal to client
 export default async function PropertyDetailPage({
@@ -11,13 +11,12 @@ export default async function PropertyDetailPage({
 }) {
   const { id } = await params;
 
-  const res = await fetch(`${API_URL}/properties/${id}`, {
-    cache: "no-store",
-  });
-
-  if (res.status === 404) notFound();
-
-  const property: PropertyPublic = await res.json();
+  let property!: PropertyPublic;
+  try {
+    property = await serverHttp.GET<PropertyPublic>(`/properties/${id}`);
+  } catch {
+    notFound();
+  }
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">

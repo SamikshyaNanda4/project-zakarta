@@ -86,7 +86,11 @@ export const property = pgTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
+    listingType: text("listing_type").notNull().default("sell"),
     bhk: integer("bhk").notNull(),
+    city: text("city").notNull().default(""),
+    price: text("price"),
+    description: text("description"),
     contact: text("contact").notNull(),
     userId: text("user_id")
       .notNull()

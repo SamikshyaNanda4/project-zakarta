@@ -32,7 +32,11 @@ export function PropertyRoutes(app: OpenAPIHono) {
     const properties = rows.map((p) => ({
       id: p.id,
       name: p.name,
+      listingType: (p.listingType ?? "sell") as "sell" | "rent",
       bhk: p.bhk,
+      city: p.city ?? "",
+      price: p.price ?? null,
+      description: p.description ?? null,
       userId: p.userId,
       createdAt: p.createdAt.toISOString(),
     }));
@@ -55,7 +59,11 @@ export function PropertyRoutes(app: OpenAPIHono) {
       {
         id: row.id,
         name: row.name,
+        listingType: (row.listingType ?? "sell") as "sell" | "rent",
         bhk: row.bhk,
+        city: row.city ?? "",
+        price: row.price ?? null,
+        description: row.description ?? null,
         userId: row.userId,
         createdAt: row.createdAt.toISOString(),
       },
@@ -70,12 +78,16 @@ export function PropertyRoutes(app: OpenAPIHono) {
 
   protectedApp.openapi(createPropertyRoute, async (c) => {
     const user = c.get("user") as typeof auth.$Infer.Session.user;
-    const { name, bhk, contact } = c.req.valid("json");
+    const { name, listingType, bhk, city, contact, price, description } = c.req.valid("json");
 
     const newProperty = {
       id: generateId(),
       name,
+      listingType,
       bhk,
+      city,
+      price: price ?? null,
+      description: description ?? null,
       contact,
       userId: user.id,
       createdAt: new Date(),
@@ -88,7 +100,11 @@ export function PropertyRoutes(app: OpenAPIHono) {
       {
         id: newProperty.id,
         name: newProperty.name,
+        listingType: newProperty.listingType as "sell" | "rent",
         bhk: newProperty.bhk,
+        city: newProperty.city,
+        price: newProperty.price,
+        description: newProperty.description,
         userId: newProperty.userId,
         createdAt: newProperty.createdAt.toISOString(),
       },

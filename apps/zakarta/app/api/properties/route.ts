@@ -1,30 +1,36 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { API_URL } from "@/lib/env";
+import { isAxiosError } from "axios";
+import { serverHttp } from "@/api/server";
+import type { PropertyListResponse } from "@/api";
 
 // GET /api/properties → Hono GET /properties
 export async function GET() {
-  const upstream = await fetch(`${API_URL}/properties`, {
-    cache: "no-store",
-  });
-
-  const data = await upstream.json();
-  return NextResponse.json(data, { status: upstream.status });
+  try {
+    const data = await serverHttp.GET<PropertyListResponse>("/properties");
+    return NextResponse.json(data);
+  } catch (err) {
+    if (isAxiosError(err) && err.response) {
+      return NextResponse.json(err.response.data, { status: err.response.status });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 // POST /api/properties → Hono POST /properties (auth + allowedToPost)
 export async function POST(req: NextRequest) {
-  const body = await req.text();
-
-  const upstream = await fetch(`${API_URL}/properties`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      // Forward auth cookies so better-auth can validate the session
-      cookie: req.headers.get("cookie") ?? "",
-    },
-    body,
-  });
-
-  const data = await upstream.json();
-  return NextResponse.json(data, { status: upstream.status });
+  const body = await req.json();
+  try {
+    const data = await serverHttp.POST("/properties", body, {
+      headers: {
+        // Forward auth cookies so better-auth can validate the session
+        cookie: req.headers.get("cookie") ?? "",
+      },
+    });
+    return NextResponse.json(data);
+  } catch (err) {
+    if (isAxiosError(err) && err.response) {
+      return NextResponse.json(err.response.data, { status: err.response.status });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { PropertyPublic } from "@/lib/api";
-import { propertiesApi } from "@/lib/api";
+import { toast } from "sonner";
+import type { PropertyPublic } from "@/api";
+import { properties } from "@/api";
 import { authClient } from "@/lib/auth-client";
 import { PropertyCard } from "./property-card";
 import { AuthModal } from "./auth-modal";
@@ -38,13 +39,13 @@ export function PropertiesListClient({ initialProperties }: Props) {
     if (pendingContactPropertyId) {
       // Auto-fetch contact for the property that triggered auth
       try {
-        const data = await propertiesApi.getContact(pendingContactPropertyId);
+        const data = await properties.getContact(pendingContactPropertyId);
         setRevealedContacts((prev) => ({
           ...prev,
           [pendingContactPropertyId]: data.contact,
         }));
       } catch {
-        // Silently fail — user can click again
+        toast.error("Sorry, the contact is unable to be given right now. Thanks for understanding!");
       }
     }
 

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Phone, BedDouble, Building2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import type { PropertyPublic } from "@/lib/api";
-import { propertiesApi } from "@/lib/api";
+import type { PropertyPublic } from "@/api";
+import { properties } from "@/api";
 import { authClient } from "@/lib/auth-client";
 import { AuthModal } from "./auth-modal";
 
@@ -28,7 +28,7 @@ export function PropertyDetailClient({ property }: Props) {
     setLoadingContact(true);
     setContactError("");
     try {
-      const data = await propertiesApi.getContact(property.id);
+      const data = await properties.getContact(property.id);
       setContact(data.contact);
     } catch (err) {
       setContactError(

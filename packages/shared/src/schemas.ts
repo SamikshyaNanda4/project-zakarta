@@ -1,5 +1,35 @@
 import { z } from "zod";
 
+// --- Property ---
+
+export const PropertyListingTypeSchema = z.enum(["sell", "rent"]);
+export type PropertyListingType = z.infer<typeof PropertyListingTypeSchema>;
+
+export const CreatePropertySchema = z.object({
+  name: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(100, "Title is too long"),
+  listingType: PropertyListingTypeSchema,
+  bhk: z.coerce
+    .number()
+    .int("BHK must be a whole number")
+    .min(1, "BHK must be at least 1")
+    .max(10, "BHK cannot exceed 10"),
+  city: z
+    .string()
+    .min(2, "City is required")
+    .max(100, "City name is too long"),
+  contact: z
+    .string()
+    .min(6, "Contact must be at least 6 characters")
+    .max(20, "Contact number is too long"),
+  price: z.string().max(50, "Price description is too long").optional(),
+  description: z.string().max(1000, "Description is too long").optional(),
+});
+
+export type CreateProperty = z.infer<typeof CreatePropertySchema>;
+
 // --- User ---
 
 export const UserSchema = z.object({

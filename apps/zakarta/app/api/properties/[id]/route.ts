@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { API_URL } from "@/lib/env";
+import { isAxiosError } from "axios";
+import { serverHttp } from "@/api/server";
+import type { PropertyPublic } from "@/api";
 
 // GET /api/properties/:id → Hono GET /properties/:id
 export async function GET(
@@ -7,11 +9,13 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-
-  const upstream = await fetch(`${API_URL}/properties/${id}`, {
-    cache: "no-store",
-  });
-
-  const data = await upstream.json();
-  return NextResponse.json(data, { status: upstream.status });
+  try {
+    const data = await serverHttp.GET<PropertyPublic>(`/properties/${id}`);
+    return NextResponse.json(data);
+  } catch (err) {
+    if (isAxiosError(err) && err.response) {
+      return NextResponse.json(err.response.data, { status: err.response.status });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

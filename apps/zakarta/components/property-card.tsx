@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Phone, Building2, BedDouble } from "lucide-react";
-import type { PropertyPublic } from "@/lib/api";
-import { propertiesApi } from "@/lib/api";
+import type { PropertyPublic } from "@/api";
+import { properties } from "@/api";
 import Link from "next/link";
 
 type PropertyCardProps = {
@@ -40,7 +40,7 @@ export function PropertyCard({
     setLoading(true);
     setError("");
     try {
-      const data = await propertiesApi.getContact(property.id);
+      const data = await properties.getContact(property.id);
       setContact(data.contact);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load contact");

@@ -19,6 +19,7 @@ export type NavbarProps = {
   links?: NavLink[];
   onSignOut?: () => void;
   appName?: string;
+  onSellRent?: () => void;
 };
 
 export function Navbar({
@@ -26,6 +27,7 @@ export function Navbar({
   links = [],
   onSignOut,
   appName = "Zakarta",
+  onSellRent,
 }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
@@ -125,6 +127,17 @@ export function Navbar({
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* Sell/Rent CTA — always visible on desktop */}
+            {onSellRent && (
+              <button
+                type="button"
+                onClick={onSellRent}
+                className="hidden cursor-pointer rounded-lg border border-emerald-700 bg-red-400 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-100 md:block"
+              >
+                Sell / Rent Your Property
+              </button>
+            )}
+
             {/* Desktop: user dropdown */}
             {user ? (
               <div ref={avatarRef} className="relative hidden md:block">
@@ -236,6 +249,16 @@ export function Navbar({
                   </li>
                 ))}
               </ul>
+            )}
+
+            {onSellRent && (
+              <button
+                type="button"
+                onClick={() => { setMenuOpen(false); onSellRent(); }}
+                className="mt-3 w-full cursor-pointer rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2.5 text-left text-sm font-medium text-indigo-700 transition-colors hover:bg-indigo-100"
+              >
+                Sell / Rent Your Property
+              </button>
             )}
           </div>
 
