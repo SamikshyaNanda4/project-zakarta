@@ -1,11 +1,17 @@
 {
-  "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "module": "CommonJS",
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
     "rootDir": "./src",
     "outDir": "dist",
-    "strictNullChecks": true,
     "types": ["node"]
   },
   "include": ["src"],

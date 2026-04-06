@@ -15,12 +15,14 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
+    console.log("hi")
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
       const result = await authClient.signUp.email({ name, email, password });
+      console.log("Hello",result)
       if (result.error) {
         setError(result.error.message ?? "Sign up failed");
       } else {

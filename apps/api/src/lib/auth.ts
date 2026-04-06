@@ -1,13 +1,20 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
-import { db } from "@/db/db"; // drizzle instance not pg instance
+import { env } from "@repo/shared/env";
+import { db } from "@/db/db";
 import * as schema from "@/db/schema";
 
 export const auth = betterAuth({
+  secret: env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema,
+    schema: {
+      user: schema.user,
+      session: schema.session,
+      account: schema.account,
+      verification: schema.verification,
+    },
   }),
   emailAndPassword: {
     enabled: true,
@@ -17,15 +24,8 @@ export const auth = betterAuth({
       allowedToPost: {
         type: "boolean",
         defaultValue: true,
-        required: false,
-        input: true,
+        input: false,
       },
     },
   },
-  plugins: [openAPI()],
-  session: {
-    expiresIn: 30 * 24 * 60 * 60 * 6, //approx 12 months
-  },
 });
-
-export type Session = typeof auth.$Infer.Session;

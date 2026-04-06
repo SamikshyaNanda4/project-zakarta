@@ -2,9 +2,19 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { auth } from "./lib/auth";
 import { registerRoutes } from "./routes";
+import { cors } from "hono/cors";
 
 const app = new OpenAPIHono();
-app.on(["POST", "GET"], "api/auth/**", (c) => auth.handler(c.req.raw));
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+    credentials: true,
+  })
+);
+
+// Leading slash is required — "api/auth/**" would never match /api/auth/...
+app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 registerRoutes(app);
 app.doc("/openapi.json", {
   openapi: "3.0.0",

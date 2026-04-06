@@ -96,7 +96,8 @@ export function AuthModal({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+        className="fixed inset-0 z-50 bg-black/50 backdrop-brightness-75"
+
         onClick={onClose}
         aria-hidden="true"
       />
@@ -108,7 +109,7 @@ export function AuthModal({
         aria-modal="true"
         aria-labelledby="auth-modal-title"
       >
-        <div className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+        <div className="relative flex flex-col w-full max-w-md rounded-2xl bg-white pt-8 px-8 pb-8 shadow-2xl min-h-[520px]">
           {/* Close */}
           <button
             onClick={onClose}
@@ -151,121 +152,125 @@ export function AuthModal({
           </div>
 
           {tab === "sign-in" ? (
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="modal-email"
-                  className="mb-1.5 block text-sm font-medium text-gray-700"
-                >
-                  Email
-                </label>
-                <input
-                  id="modal-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="modal-password"
-                  className="mb-1.5 block text-sm font-medium text-gray-700"
-                >
-                  Password
-                </label>
-                <input
-                  id="modal-password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                />
-              </div>
+            <form onSubmit={handleSignIn} className="flex flex-1 flex-col gap-4">
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="modal-email"
+                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="modal-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="modal-password"
+                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="modal-password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                  />
+                </div>
 
-              {error && (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-                  {error}
-                </p>
-              )}
+                {error && (
+                  <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {error}
+                  </p>
+                )}
+              </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 transition-colors"
+                className="mt-auto w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 transition-colors"
               >
                 {loading ? "Signing in…" : "Sign in"}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSignUp} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="modal-name"
-                  className="mb-1.5 block text-sm font-medium text-gray-700"
-                >
-                  Full name
-                </label>
-                <input
-                  id="modal-name"
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Jane Doe"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="modal-signup-email"
-                  className="mb-1.5 block text-sm font-medium text-gray-700"
-                >
-                  Email
-                </label>
-                <input
-                  id="modal-signup-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="modal-signup-password"
-                  className="mb-1.5 block text-sm font-medium text-gray-700"
-                >
-                  Password
-                </label>
-                <input
-                  id="modal-signup-password"
-                  type="password"
-                  required
-                  minLength={8}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 8 characters"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                />
-              </div>
+            <form onSubmit={handleSignUp} className="flex flex-1 flex-col gap-4">
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="modal-name"
+                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                  >
+                    Full name
+                  </label>
+                  <input
+                    id="modal-name"
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Jane Doe"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="modal-signup-email"
+                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="modal-signup-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="modal-signup-password"
+                    className="mb-1.5 block text-sm font-medium text-gray-700"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="modal-signup-password"
+                    type="password"
+                    required
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Min 8 characters"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                  />
+                </div>
 
-              {error && (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-                  {error}
-                </p>
-              )}
+                {error && (
+                  <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {error}
+                  </p>
+                )}
+              </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 transition-colors"
+                className="mt-auto w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 disabled:opacity-60 transition-colors"
               >
                 {loading ? "Creating account…" : "Create account"}
               </button>
