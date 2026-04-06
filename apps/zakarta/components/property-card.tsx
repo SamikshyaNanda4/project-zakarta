@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Phone, Building2, BedDouble } from "lucide-react";
 import type { PropertyPublic } from "@/lib/api";
 import { propertiesApi } from "@/lib/api";
+import Link from "next/link";
 
 type PropertyCardProps = {
   property: PropertyPublic;
@@ -53,11 +54,11 @@ export function PropertyCard({
       {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-2">
         <h3 className="text-base font-semibold leading-snug text-gray-900">
-          <a href={`/properties/${property.id}`} className="hover:underline">
+          <Link href={`/properties/${property.id}`} className="hover:underline">
             {property.name}
-          </a>
+          </Link>
         </h3>
-        <span className="shrink-0 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+        <span className="shrink-0 rounded-full bg-emerald-100   px-2.5 py-0.5 text-xs font-medium text-white-700">
           Listed
         </span>
       </div>

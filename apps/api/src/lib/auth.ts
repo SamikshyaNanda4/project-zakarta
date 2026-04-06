@@ -16,6 +16,7 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
+  trustedOrigins: [`http://localhost:${env.FRONTEND_PORT}`],
   emailAndPassword: {
     enabled: true,
   },

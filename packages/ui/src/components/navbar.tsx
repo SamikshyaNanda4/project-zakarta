@@ -96,23 +96,24 @@ export function Navbar({
         className="fixed top-0 left-0 right-0 z-40 h-14 w-full border-b border-gray-200 bg-white"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
-        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-full max-w-8xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <a
+          <div className="flex items-center justify-start">
+            <a
             href="/"
-            className="shrink-0 cursor-pointer text-xl font-bold tracking-tight text-gray-900"
+            className="shrink-0 cursor-pointer text-xl font-bold tracking-tight text-gray-900 ml-8"
           >
             {appName}
           </a>
 
           {/* Desktop nav links */}
           {links.length > 0 && (
-            <ul className="hidden items-center gap-6 md:flex">
+            <ul className="hidden items-center gap-1 md:flex ml-16">
               {links.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    className="cursor-pointer text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                    className="cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
                   >
                     {link.label}
                   </a>
@@ -120,6 +121,7 @@ export function Navbar({
               ))}
             </ul>
           )}
+          </div>
 
           {/* Right side */}
           <div className="flex items-center gap-2">
