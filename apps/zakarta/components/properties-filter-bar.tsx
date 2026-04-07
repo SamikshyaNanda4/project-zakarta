@@ -150,12 +150,12 @@ export function PropertiesFilterBar({
   // Filter locality suggestions
   useEffect(() => {
     if (!localitySearch.trim()) {
-      setLocalitySuggestions(allLocalities.filter((l) => !filters.localityIds.includes(l.id)).slice(0, 8));
+      setLocalitySuggestions(allLocalities.filter((l) => !filters.localityIds.includes(l.id)));
       return;
     }
     const q = localitySearch.toLowerCase();
     setLocalitySuggestions(
-      allLocalities.filter((l) => l.name.toLowerCase().includes(q) && !filters.localityIds.includes(l.id)).slice(0, 8)
+      allLocalities.filter((l) => l.name.toLowerCase().includes(q) && !filters.localityIds.includes(l.id))
     );
   }, [localitySearch, allLocalities, filters.localityIds]);
 
@@ -182,11 +182,9 @@ export function PropertiesFilterBar({
   }, [router, searchParams, priceMax]);
 
   function update(patch: Partial<Filters>) {
-    setFilters((prev) => {
-      const next = { ...prev, ...patch };
-      push(next);
-      return next;
-    });
+    const next = { ...filters, ...patch };
+    setFilters(next);
+    push(next);
   }
 
   function toggleBhk(val: string) {

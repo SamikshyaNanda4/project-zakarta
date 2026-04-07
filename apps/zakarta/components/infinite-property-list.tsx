@@ -9,6 +9,7 @@ import { properties } from "@/api";
 import { authClient } from "@/lib/auth-client";
 import { PropertyCard } from "./property-card";
 import { AuthModal } from "./auth-modal";
+import { LucideHome } from "lucide-react";
 
 type FilterParams = {
   listingType?: "sell" | "rent";
@@ -120,7 +121,7 @@ export function InfinitePropertyList({
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
-          <span className="text-3xl">🏠</span>
+          <span className="text-3xl"><LucideHome color="green"/></span>
         </div>
         <p className="text-lg font-semibold text-gray-700">No properties found</p>
         <p className="mt-1 text-sm text-gray-400">Try adjusting your filters</p>
