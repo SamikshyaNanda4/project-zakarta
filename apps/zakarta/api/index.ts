@@ -4,11 +4,18 @@ export type {
   PropertyListResponse,
   ContactResponse,
   CreatePropertyBody,
+  CreateSellPropertyBody,
+  CreateRentPropertyBody,
+  PropertyPhoto,
+  SellAmenities,
+  RentAmenities,
+  Locality,
+  LocalityListResponse,
   ApiError,
 } from "./types";
 
-// HTTP helpers — useful when you need raw access to GET/POST/PUT/PATCH/DELETE
+// HTTP helpers
 export { http, createHttpClient } from "./http";
 
-// Resource objects — use these in components
-export { properties } from "./resources/properties";
+// Resource objects
+export { properties, localities } from "./resources/properties";

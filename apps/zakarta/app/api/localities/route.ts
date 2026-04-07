@@ -1,18 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { isAxiosError } from "axios";
 import { serverHttp } from "@/api/server";
-import type { ContactResponse } from "@/api";
+import type { LocalityListResponse } from "@/api";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
+export async function GET(req: NextRequest) {
   try {
-    const data = await serverHttp.POST<ContactResponse>(
-      `/properties/${id}/contact`,
-      undefined,
-      { headers: { cookie: req.headers.get("cookie") ?? "" } }
+    const area = req.nextUrl.searchParams.get("area");
+    if (!area) {
+      return NextResponse.json({ error: "area param is required" }, { status: 400 });
+    }
+    const data = await serverHttp.GET<LocalityListResponse>(
+      `/localities?area=${encodeURIComponent(area)}`
     );
     return NextResponse.json(data);
   } catch (err) {

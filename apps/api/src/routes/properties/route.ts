@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import { z } from "@hono/zod-openapi";
 import {
   PropertyParamsSchema,
   PropertyPublicSchema,
@@ -13,8 +14,17 @@ export const listPropertiesRoute = createRoute({
   method: "get",
   path: "/properties",
   summary: "List all properties",
-  description: "Returns a paginated list of properties (contact hidden).",
+  description: "Returns properties with basic info (contact hidden).",
   tags: ["Properties"],
+  request: {
+    query: z.object({
+      listingType: z.enum(["sell", "rent"]).optional().openapi({ example: "sell" }),
+      area: z.string().optional().openapi({ example: "Bhubaneswar" }),
+      localityId: z.string().optional(),
+      page: z.coerce.number().int().min(1).default(1).optional(),
+      pageSize: z.coerce.number().int().min(1).max(50).default(20).optional(),
+    }),
+  },
   responses: {
     200: {
       content: { "application/json": { schema: PropertyListResponseSchema } },
@@ -27,7 +37,7 @@ export const getPropertyRoute = createRoute({
   method: "get",
   path: "/properties/{id}",
   summary: "Get a property by ID",
-  description: "Returns a single property without contact info.",
+  description: "Returns a property with all details (contact hidden).",
   tags: ["Properties"],
   request: { params: PropertyParamsSchema },
   responses: {
@@ -46,7 +56,7 @@ export const createPropertyRoute = createRoute({
   method: "post",
   path: "/properties",
   summary: "Create a property listing",
-  description: "Creates a new property. Requires auth and allowedToPost flag.",
+  description: "Creates a new sell or rent listing. Requires auth and allowedToPost flag.",
   tags: ["Properties"],
   security: [{ cookieAuth: [] }],
   request: {
@@ -68,6 +78,10 @@ export const createPropertyRoute = createRoute({
       content: { "application/json": { schema: ErrorSchema } },
       description: "Forbidden",
     },
+    422: {
+      content: { "application/json": { schema: ErrorSchema } },
+      description: "Locality not found",
+    },
   },
 });
 
@@ -76,7 +90,7 @@ export const getContactRoute = createRoute({
   path: "/properties/{id}/contact",
   summary: "Reveal property contact",
   description:
-    "Returns the contact number for a property. Requires authentication. Contact is revealed per-request to prevent scraping.",
+    "Returns the owner contact for a property. Requires authentication. Revealed per-request to prevent scraping.",
   tags: ["Properties"],
   security: [{ cookieAuth: [] }],
   request: { params: PropertyParamsSchema },

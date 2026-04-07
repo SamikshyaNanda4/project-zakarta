@@ -6,9 +6,9 @@ import ProductCarousel from "@/components/Corousal/dynamic-corousal";
 export const products = [
   {
     id: 1,
-    name: "Premium Wireless Headphones",
-    description: "Immerse yourself in crystal-clear sound with our latest noise-cancelling technology.",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+    name: "Premium 3BHK Properties in Kalinga Nagar",
+    description: "Spacious • Vaastu-compliant • Ready to move",
+    image: "https://images.unsplash.com/photo-1617217139357-b77ae58ad4b2?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     id: 2,
