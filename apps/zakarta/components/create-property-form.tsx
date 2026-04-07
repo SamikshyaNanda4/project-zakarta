@@ -1,356 +1,391 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Building2,
+  CheckCircle2,
+  Home,
+  IndianRupee,
+  Loader2,
+  MapPin,
+  Phone,
+  Tag,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@repo/ui/components/ui/button";
+import { Input } from "@repo/ui/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@repo/ui/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/ui/select";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+import { Badge } from "@repo/ui/components/ui/badge";
+import { Separator } from "@repo/ui/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@repo/ui/components/ui/card";
+
 import { authClient } from "@/lib/auth-client";
 import { properties } from "@/api";
-import { CreatePropertySchema } from "@repo/shared/schemas";
-import type { PropertyListingType } from "@/api/types";
+import { CreatePropertySchema, type CreateProperty } from "@repo/shared/schemas";
 
-type FormState = {
-  name: string;
-  listingType: PropertyListingType;
-  bhk: string;
-  city: string;
-  contact: string;
-  price: string;
-  description: string;
-};
-
-type FieldErrors = Partial<Record<keyof FormState, string>>;
-
-const INITIAL_STATE: FormState = {
-  name: "",
-  listingType: "sell",
-  bhk: "1",
-  city: "",
-  contact: "",
-  price: "",
-  description: "",
-};
+const BHK_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
 
 export function CreatePropertyForm() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
-  const [form, setForm] = useState<FormState>(INITIAL_STATE);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [serverError, setServerError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const form = useForm<CreateProperty>({
+    resolver: zodResolver(CreatePropertySchema),
+    defaultValues: {
+      listingType: "sell",
+      bhk: 1,
+      name: "",
+      city: "",
+      contact: "",
+      price: "",
+      description: "",
+    },
+  });
 
-  // Redirect if not authenticated once session resolves
+  const listingType = form.watch("listingType");
+  const { isSubmitting, isSubmitSuccessful } = form.formState;
+
+  // Guard: redirect unauthenticated users once session resolves
   useEffect(() => {
     if (!isPending && !session?.user) {
       router.replace("/");
     }
   }, [isPending, session, router]);
 
-  function set(field: keyof FormState, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    // Clear field error on change
-    if (fieldErrors[field]) {
-      setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setServerError("");
-    setFieldErrors({});
-
-    // Client-side validation using the shared Zod schema
-    const parsed = CreatePropertySchema.safeParse({
-      name: form.name.trim(),
-      listingType: form.listingType,
-      bhk: Number(form.bhk),
-      city: form.city.trim(),
-      contact: form.contact.trim(),
-      price: form.price.trim() || undefined,
-      description: form.description.trim() || undefined,
-    });
-
-    if (!parsed.success) {
-      const errors: FieldErrors = {};
-      for (const issue of parsed.error.issues) {
-        const field = issue.path[0] as keyof FormState;
-        if (field && !errors[field]) {
-          errors[field] = issue.message;
-        }
-      }
-      setFieldErrors(errors);
-      return;
-    }
-
-    setSubmitting(true);
+  async function onSubmit(data: CreateProperty) {
     try {
-      await properties.create(parsed.data);
-      setSuccess(true);
-      setForm(INITIAL_STATE);
+      await properties.create(data);
+      toast.success("Property listed successfully!", {
+        description: "Interested buyers/renters can now request your contact.",
+      });
+      form.reset();
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : "Something went wrong. Please try again.";
-      // Surface 401/403 meaningfully
-      if (typeof err === "object" && err !== null && "response" in err) {
-        const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
-        if (axiosErr.response?.status === 401) {
-          setServerError("You must be signed in to post a property.");
-          return;
-        }
-        if (axiosErr.response?.status === 403) {
-          setServerError("Your account is not permitted to post listings.");
-          return;
-        }
-        if (axiosErr.response?.data?.error) {
-          setServerError(axiosErr.response.data.error);
-          return;
-        }
+      const apiErr = err as {
+        response?: { status?: number; data?: { error?: string } };
+      };
+
+      if (apiErr.response?.status === 401) {
+        toast.error("Authentication required", {
+          description: "You must be signed in to post a property.",
+        });
+        return;
       }
-      setServerError(msg);
-    } finally {
-      setSubmitting(false);
+      if (apiErr.response?.status === 403) {
+        toast.error("Permission denied", {
+          description: "Your account is not permitted to post listings.",
+        });
+        return;
+      }
+      const message = apiErr.response?.data?.error ?? "Something went wrong. Please try again.";
+      toast.error("Failed to post listing", { description: message });
     }
   }
+
+  // ── Loading state ───────────────────────────────────────────────────────────
 
   if (isPending) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-7 w-7 animate-spin text-indigo-600" />
       </div>
     );
   }
 
-  if (success) {
+  // ── Success state ───────────────────────────────────────────────────────────
+
+  if (isSubmitSuccessful && !isSubmitting) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center">
-        <CheckCircle className="mx-auto mb-4 h-12 w-12 text-emerald-500" />
-        <h2 className="text-xl font-semibold text-emerald-800">Property listed!</h2>
-        <p className="mt-1 text-sm text-emerald-700">
-          Your listing is live. Interested buyers/renters can request your contact.
-        </p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <button
-            type="button"
-            onClick={() => setSuccess(false)}
-            className="rounded-lg border border-emerald-300 px-5 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 transition-colors"
-          >
-            Post another
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
-          >
-            Browse listings
-          </button>
-        </div>
-      </div>
+      <Card  className="border-emerald-200 bg-emerald-50 shadow-md ">
+        <CardContent className="flex flex-col items-center py-12 text-center">
+          <CheckCircle2 className="mb-4 h-14 w-14 text-emerald-500" />
+          <h2 className="text-xl font-semibold text-emerald-800">Property listed!</h2>
+          <p className="mt-1.5 max-w-xs text-sm text-emerald-700">
+            Your listing is live. Interested buyers/renters can request your contact.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button
+              variant="outline"
+              className="border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+              onClick={() => form.reset({ listingType: "sell", bhk: 1, name: "", city: "", contact: "", price: "", description: "" })}
+            >
+              Post another listing
+            </Button>
+            <Button
+              className="bg-indigo-600 hover:bg-indigo-700"
+              onClick={() => router.push("/")}
+            >
+              Browse listings
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
+  // ── Form ─────────────────────────────────────────────────────────────────────
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
-    >
-      {/* Listing type toggle */}
-      <fieldset>
-        <legend className="mb-2 block text-sm font-medium text-gray-700">
-          Listing type <span className="text-red-500">*</span>
-        </legend>
-        <div className="flex gap-3">
-          {(["sell", "rent"] as PropertyListingType[]).map((type) => (
-            <label
-              key={type}
-              className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
-                form.listingType === type
-                  ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                  : "border-gray-300 text-gray-600 hover:border-gray-400"
-              }`}
-            >
-              <input
-                type="radio"
-                name="listingType"
-                value={type}
-                checked={form.listingType === type}
-                onChange={() => set("listingType", type)}
-                className="sr-only"
+    <Card className="shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Building2 className="h-5 w-5 text-indigo-600" />
+          New property listing
+        </CardTitle>
+        <CardDescription>
+          Fill in the details below. Your contact number stays hidden until a verified user requests it.
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-6">
+
+            {/* ── Listing type ───────────────────────────────────────────────── */}
+            <FormField
+              control={form.control}
+              name="listingType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5">
+                    <Tag className="h-3.5 w-3.5" />
+                    Listing type
+                  </FormLabel>
+                  <FormControl>
+                    <div className="flex gap-3">
+                      {(["sell", "rent"] as const).map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => field.onChange(type)}
+                          className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+                            listingType === type
+                              ? "border-indigo-500 bg-indigo-50 text-indigo-700"
+                              : "border-input bg-background text-muted-foreground hover:border-muted-foreground"
+                          }`}
+                        >
+                          {type === "sell" ? (
+                            <>
+                              <Home className="h-4 w-4" />
+                              For Sale
+                            </>
+                          ) : (
+                            <>
+                              <IndianRupee className="h-4 w-4" />
+                              For Rent
+                            </>
+                          )}
+                          {listingType === type && (
+                            <Badge className="ml-1 h-4 px-1 py-0 text-[10px] bg-indigo-600">
+                              Selected
+                            </Badge>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Separator />
+
+            {/* ── Property title ─────────────────────────────────────────────── */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5">
+                    <Building2 className="h-3.5 w-3.5" />
+                    Property title
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder='e.g. "Spacious 2BHK near Indiranagar metro"'
+                      maxLength={100}
+                      autoComplete="off"
+                    />
+                  </FormControl>
+                  <FormDescription>Between 3 and 100 characters.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* ── BHK + City ─────────────────────────────────────────────────── */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="bhk"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>BHK</FormLabel>
+                    <Select
+                      onValueChange={(v) => field.onChange(Number(v))}
+                      defaultValue={String(field.value)}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select BHK" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {BHK_OPTIONS.map((n) => (
+                          <SelectItem key={n} value={String(n)}>
+                            {n} BHK
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {type === "sell" ? "For Sale" : "For Rent"}
-            </label>
-          ))}
-        </div>
-      </fieldset>
 
-      {/* Property title */}
-      <Field
-        id="name"
-        label="Property title"
-        required
-        error={fieldErrors.name}
-        hint='e.g. "Spacious 2BHK near Indiranagar metro"'
-      >
-        <input
-          id="name"
-          type="text"
-          value={form.name}
-          onChange={(e) => set("name", e.target.value)}
-          placeholder="Sunny 2BHK in Koramangala"
-          maxLength={100}
-          className={inputCls(!!fieldErrors.name)}
-        />
-      </Field>
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5" />
+                      City
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Bengaluru"
+                        maxLength={100}
+                        autoComplete="address-level2"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-      {/* BHK + City row */}
-      <div className="grid grid-cols-2 gap-4">
-        <Field id="bhk" label="BHK" required error={fieldErrors.bhk}>
-          <select
-            id="bhk"
-            value={form.bhk}
-            onChange={(e) => set("bhk", e.target.value)}
-            className={inputCls(!!fieldErrors.bhk)}
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <option key={n} value={n}>
-                {n} BHK
-              </option>
-            ))}
-          </select>
-        </Field>
+            {/* ── Price ──────────────────────────────────────────────────────── */}
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5">
+                    <IndianRupee className="h-3.5 w-3.5" />
+                    Price / Rent
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">(optional)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder='e.g. "45 Lakhs" or "₹25,000 / month"'
+                      maxLength={50}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <Field id="city" label="City" required error={fieldErrors.city}>
-          <input
-            id="city"
-            type="text"
-            value={form.city}
-            onChange={(e) => set("city", e.target.value)}
-            placeholder="Bengaluru"
-            maxLength={100}
-            className={inputCls(!!fieldErrors.city)}
-          />
-        </Field>
-      </div>
+            {/* ── Description ────────────────────────────────────────────────── */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Description
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">(optional)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Nearby amenities, furnishing, facing direction, parking…"
+                      maxLength={1000}
+                      rows={4}
+                      className="resize-none"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {(field.value?.length ?? 0)} / 1000 characters
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      {/* Price (optional) */}
-      <Field
-        id="price"
-        label="Price / Rent"
-        error={fieldErrors.price}
-        hint='e.g. "45 Lakhs" or "₹25,000 / month"'
-      >
-        <input
-          id="price"
-          type="text"
-          value={form.price}
-          onChange={(e) => set("price", e.target.value)}
-          placeholder="Optional"
-          maxLength={50}
-          className={inputCls(!!fieldErrors.price)}
-        />
-      </Field>
+            <Separator />
 
-      {/* Description (optional) */}
-      <Field
-        id="description"
-        label="Description"
-        error={fieldErrors.description}
-        hint="Up to 1000 characters"
-      >
-        <textarea
-          id="description"
-          value={form.description}
-          onChange={(e) => set("description", e.target.value)}
-          placeholder="Describe the property — nearby amenities, furnishing, facing, etc."
-          maxLength={1000}
-          rows={4}
-          className={inputCls(!!fieldErrors.description)}
-        />
-      </Field>
+            {/* ── Contact ────────────────────────────────────────────────────── */}
+            <FormField
+              control={form.control}
+              name="contact"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5">
+                    <Phone className="h-3.5 w-3.5" />
+                    Your contact number
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      maxLength={20}
+                      autoComplete="tel"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Hidden from listings — only revealed to verified users on request.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      {/* Contact */}
-      <Field
-        id="contact"
-        label="Your contact number"
-        required
-        error={fieldErrors.contact}
-        hint="Hidden from listings — only revealed to verified users on request."
-      >
-        <input
-          id="contact"
-          type="tel"
-          value={form.contact}
-          onChange={(e) => set("contact", e.target.value)}
-          placeholder="+91 98765 43210"
-          maxLength={20}
-          className={inputCls(!!fieldErrors.contact)}
-        />
-      </Field>
+            {/* ── Submit ─────────────────────────────────────────────────────── */}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-indigo-600 hover:bg-indigo-700"
+              size="lg"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Submitting…
+                </>
+              ) : (
+                "Post Listing"
+              )}
+            </Button>
 
-      {/* Server error */}
-      {serverError && (
-        <div className="flex items-start gap-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>{serverError}</span>
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-60"
-      >
-        {submitting ? (
-          <span className="flex items-center justify-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Submitting…
-          </span>
-        ) : (
-          "Post Listing"
-        )}
-      </button>
-    </form>
-  );
-}
-
-// ── helpers ──────────────────────────────────────────────────────────────────
-
-function inputCls(hasError: boolean) {
-  return `w-full rounded-lg border px-3 py-2 text-sm outline-none transition ${
-    hasError
-      ? "border-red-400 bg-red-50 placeholder:text-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-      : "border-gray-300 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-  }`;
-}
-
-function Field({
-  id,
-  label,
-  required,
-  error,
-  hint,
-  children,
-}: {
-  id: string;
-  label: string;
-  required?: boolean;
-  error?: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-gray-700">
-        {label}
-        {required && <span className="ml-0.5 text-red-500">*</span>}
-      </label>
-      {children}
-      {error ? (
-        <p className="mt-1 text-xs text-red-600">{error}</p>
-      ) : hint ? (
-        <p className="mt-1 text-xs text-gray-400">{hint}</p>
-      ) : null}
-    </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

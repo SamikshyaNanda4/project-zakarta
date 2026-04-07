@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import { Toaster } from "sonner";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Zakarta — Find Your Home",
@@ -19,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-gray-50 antialiased">
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-screen bg-gray-50 antialiased font-sans">
         <NavbarWrapper />
         {children}
         <Toaster richColors position="bottom-center"  />

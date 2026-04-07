@@ -132,7 +132,7 @@ export function Navbar({
               <button
                 type="button"
                 onClick={onSellRent}
-                className="hidden cursor-pointer rounded-lg border border-emerald-700 bg-red-400 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-100 md:block"
+                className="hidden cursor-pointer rounded-sm border border-white bg-emerald-400 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600 md:block"
               >
                 Sell / Rent Your Property
               </button>
@@ -176,13 +176,13 @@ export function Navbar({
               <div className="hidden items-center gap-2 md:flex">
                 <a
                   href="/sign-in"
-                  className="cursor-pointer rounded-lg px-4 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                  className="cursor-pointer rounded-sm px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:underline"
                 >
-                  Sign in
+                  Login
                 </a>
                 <a
                   href="/sign-up"
-                  className="cursor-pointer rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+                  className="cursor-pointer rounded-sm bg-gray-100 px-2 py-1.5 text-sm font-medium text-emerald-950 transition-colors hover:bg-emerald-200 hover:underline"
                 >
                   Sign up
                 </a>

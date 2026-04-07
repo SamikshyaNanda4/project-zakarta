@@ -1,5 +1,6 @@
 "use client"
 import React from 'react'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Product {
@@ -18,9 +19,13 @@ interface ProductCarouselProps {
 
 const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
   const [currentSlide, setCurrentSlide] = React.useState(0)
+  const [paused, setPaused] = React.useState(false)
   const touchStartX = React.useRef<number | null>(null)
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % products.length)
+  const nextSlide = React.useCallback(
+    () => setCurrentSlide((prev) => (prev + 1) % products.length),
+    [products.length]
+  )
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + products.length) % products.length)
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -38,9 +43,10 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
   }
 
   React.useEffect(() => {
+    if (paused) return
     const timer = setInterval(nextSlide, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [paused, nextSlide])
 
   return (
     <div className="relative w-full">
@@ -59,8 +65,12 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
             />
             <div className="absolute inset-0 bg-black bg-opacity-40">
               {/* Shop Now: top-right on mobile, left-center (after chevron) on md+ */}
-              <button className="absolute top-4 left-4 md:top-1/2 md:-translate-y-1/2 md:left-20 md:right-auto bg-white text-black font-bold py-2 px-6 rounded-full hover:bg-gray-200 transition duration-300">
-                Shop Now
+              <button
+                className="absolute top-4 left-4 md:top-1/2 md:-translate-y-1/2 md:left-20 md:right-auto bg-white text-black font-bold py-2 px-6 rounded-full hover:bg-gray-200 transition duration-300"
+                onMouseEnter={() => setPaused(true)}
+                onMouseLeave={() => setPaused(false)}
+              >
+                Explore
               </button>
               {/* Name + description: bottom-right, smaller text on mobile */}
               <div className="absolute bottom-14 right-4 md:bottom-16 md:right-10 flex flex-col items-start text-left text-white max-w-[60%] md:max-w-md">

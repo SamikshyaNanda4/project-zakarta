@@ -11,7 +11,7 @@ export const CreatePropertySchema = z.object({
     .min(3, "Title must be at least 3 characters")
     .max(100, "Title is too long"),
   listingType: PropertyListingTypeSchema,
-  bhk: z.coerce
+  bhk: z
     .number()
     .int("BHK must be a whole number")
     .min(1, "BHK must be at least 1")

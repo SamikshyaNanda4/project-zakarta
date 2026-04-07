@@ -59,7 +59,7 @@ export function PropertyCard({
           </Link>
         </h3>
         <span className="shrink-0 rounded-full bg-emerald-100   px-2.5 py-0.5 text-xs font-medium text-white-700">
-          Listed
+          Featured
         </span>
       </div>
 

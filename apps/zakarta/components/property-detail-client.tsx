@@ -71,7 +71,7 @@ export function PropertyDetailClient({ property }: Props) {
         <div className="mb-6 flex items-start justify-between gap-4">
           <h1 className="text-2xl font-bold text-gray-900">{property.name}</h1>
           <span className="shrink-0 rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700">
-            Listed
+            Featured
           </span>
         </div>
 

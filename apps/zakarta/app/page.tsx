@@ -41,8 +41,8 @@ export default async function HomePage() {
         </h1>
         <p className="mt-2 text-base text-gray-500">
           {data.total > 0
-            ? `${data.total} ${data.total === 1 ? "property" : "properties"} available`
-            : "Browse available properties below."}
+            ? `${data.total} ${data.total === 1 ? " stadout property" : " standout properties"} featured for today.`
+            : "Browse available properties above."}
         </p>
       </div>
       

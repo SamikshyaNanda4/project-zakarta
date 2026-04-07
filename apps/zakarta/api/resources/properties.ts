@@ -26,17 +26,17 @@ export const properties = {
     return http.GET<PropertyListResponse>("/properties");
   },
 
-  /** GET /api/properties/:id — fetch a single property */
+  // GET /api/properties/:id — fetch a single property
   find(id: string): Promise<PropertyPublic> {
     return http.GET<PropertyPublic>(`/properties/${id}`);
   },
 
-  /** POST /api/properties/:id/contact — reveal owner contact (auth required) */
+  //POST /api/properties/:id/contact — reveal owner contact (auth required)
   getContact(id: string): Promise<ContactResponse> {
     return http.POST<ContactResponse>(`/properties/${id}/contact`);
   },
 
-  /** POST /api/properties — create a new listing (auth required) */
+  // POST /api/properties — create a new listing (auth required)
   create(body: CreatePropertyBody): Promise<PropertyPublic> {
     return http.POST<PropertyPublic>("/properties", body);
   },

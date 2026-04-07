@@ -78,7 +78,8 @@ export function PropertyRoutes(app: OpenAPIHono) {
 
   protectedApp.openapi(createPropertyRoute, async (c) => {
     const user = c.get("user") as typeof auth.$Infer.Session.user;
-    const { name, listingType, bhk, city, contact, price, description } = c.req.valid("json");
+    const { name, listingType, bhk, city, contact, price, description } =
+      c.req.valid("json");
 
     const newProperty = {
       id: generateId(),
