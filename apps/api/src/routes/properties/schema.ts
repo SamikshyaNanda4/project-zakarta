@@ -27,6 +27,7 @@ export const PropertyPublicSchema = z
     bhk: z.string().openapi({ example: "2" }),
     userId: z.string().openapi({ example: "user_xyz" }),
     createdAt: z.string().openapi({ example: "2026-04-07T10:00:00.000Z" }),
+    featuredAt: z.string().nullable().openapi({ example: null }),
     // sell fields (nullable when rent)
     expectedPrice: z.string().nullable().openapi({ example: "45.00" }),
     // rent fields (nullable when sell)

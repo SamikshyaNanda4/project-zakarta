@@ -219,6 +219,7 @@ export const property = pgTable(
     listingType: listingTypeEnum("listing_type").notNull(),
     title: text("title").notNull(),
     contact: text("contact").notNull(),
+    featuredAt: timestamp("featured_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -229,6 +230,7 @@ export const property = pgTable(
     index("property_userId_idx").on(table.userId),
     index("property_localityId_idx").on(table.localityId),
     index("property_listingType_idx").on(table.listingType),
+    index("property_featuredAt_idx").on(table.featuredAt),
   ]
 );
 

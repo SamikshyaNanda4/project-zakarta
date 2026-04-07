@@ -6,6 +6,11 @@ import { cors } from "hono/cors";
 
 const app = new OpenAPIHono();
 
+app.onError((err, c) => {
+  console.error("[API Error]", err);
+  return c.json({ error: "Internal server error" }, 500);
+});
+
 app.use(
   cors({
     origin: ["http://localhost:3000"],

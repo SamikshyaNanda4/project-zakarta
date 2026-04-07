@@ -15,6 +15,7 @@ export type PropertyPublic = {
   bhk: string;
   userId: string;
   createdAt: string;
+  featuredAt: string | null;
   expectedPrice: string | null;
   expectedRent: string | null;
   description: string | null;

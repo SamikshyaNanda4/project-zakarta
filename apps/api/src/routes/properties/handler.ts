@@ -1,5 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { eq } from "drizzle-orm";
+import { eq, isNotNull, inArray, and } from "drizzle-orm";
 import { db } from "@/db/db";
 import {
   property,
@@ -47,6 +47,7 @@ function buildPublicProperty(
     bhk: sellRow?.bhk ?? rentRow?.bhk ?? "",
     userId: row.userId,
     createdAt: row.createdAt.toISOString(),
+    featuredAt: row.featuredAt ? row.featuredAt.toISOString() : null,
     expectedPrice: sellRow?.expectedPrice ?? null,
     expectedRent: rentRow?.expectedRent ?? null,
     description: sellRow?.description ?? rentRow?.description ?? null,
@@ -58,10 +59,41 @@ function buildPublicProperty(
 export function PropertyRoutes(app: OpenAPIHono) {
   // ── GET /properties ──────────────────────────────────────────────────────────
   app.openapi(listPropertiesRoute, async (c) => {
-    const { listingType, area, localityId, page = 1, pageSize = 20 } =
-      c.req.valid("query");
+    const {
+      listingType,
+      area,
+      localityId,
+      localityIds,
+      bhk,
+      homeType,
+      priceMin,
+      priceMax,
+      builtUpAreaMin,
+      builtUpAreaMax,
+      furnished,
+      parking,
+      propertyAge,
+      bathrooms,
+      featured,
+      page = 1,
+      pageSize = 20,
+    } = c.req.valid("query");
+
+    // Build DB-level where conditions
+    const conditions = [];
+    if (listingType) conditions.push(eq(property.listingType, listingType));
+    if (featured === "true") conditions.push(isNotNull(property.featuredAt));
+
+    // Locality filtering: localityIds (comma-sep, up to 5) takes precedence over localityId
+    if (localityIds) {
+      const ids = localityIds.split(",").slice(0, 5).map((s) => s.trim()).filter(Boolean);
+      if (ids.length > 0) conditions.push(inArray(property.localityId, ids));
+    } else if (localityId) {
+      conditions.push(eq(property.localityId, localityId));
+    }
 
     const rows = await db.query.property.findMany({
+      where: conditions.length > 0 ? and(...conditions) : undefined,
       orderBy: (p, { desc }) => [desc(p.createdAt)],
       with: {
         locality: true,
@@ -71,10 +103,33 @@ export function PropertyRoutes(app: OpenAPIHono) {
       },
     });
 
+    // In-memory filters for fields on sell/rent detail tables
     let filtered = rows;
-    if (listingType) filtered = filtered.filter((r) => r.listingType === listingType);
     if (area) filtered = filtered.filter((r) => r.locality.area === area);
-    if (localityId) filtered = filtered.filter((r) => r.localityId === localityId);
+    if (bhk) filtered = filtered.filter((r) => (r.sellDetails?.bhk ?? r.rentDetails?.bhk) === bhk);
+    if (homeType) filtered = filtered.filter((r) => (r.sellDetails?.homeType ?? r.rentDetails?.homeType) === homeType);
+    if (furnished) filtered = filtered.filter((r) => (r.sellDetails?.furnishedStatus ?? r.rentDetails?.furnished) === furnished);
+    if (parking) filtered = filtered.filter((r) => (r.sellDetails?.parking ?? r.rentDetails?.parking) === parking);
+    if (propertyAge) filtered = filtered.filter((r) => (r.sellDetails?.propertyAge ?? r.rentDetails?.propertyAge) === propertyAge);
+    if (bathrooms) filtered = filtered.filter((r) => (r.sellDetails?.bathrooms ?? r.rentDetails?.bathrooms) === bathrooms);
+    if (priceMin != null) {
+      filtered = filtered.filter((r) => {
+        const price = r.sellDetails?.expectedPrice ?? r.rentDetails?.expectedRent;
+        return price != null && parseFloat(price) >= priceMin!;
+      });
+    }
+    if (priceMax != null) {
+      filtered = filtered.filter((r) => {
+        const price = r.sellDetails?.expectedPrice ?? r.rentDetails?.expectedRent;
+        return price != null && parseFloat(price) <= priceMax!;
+      });
+    }
+    if (builtUpAreaMin != null) {
+      filtered = filtered.filter((r) => r.sellDetails != null && r.sellDetails.builtUpArea >= builtUpAreaMin!);
+    }
+    if (builtUpAreaMax != null) {
+      filtered = filtered.filter((r) => r.sellDetails != null && r.sellDetails.builtUpArea <= builtUpAreaMax!);
+    }
 
     const total = filtered.length;
     const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
@@ -272,7 +327,7 @@ export function PropertyRoutes(app: OpenAPIHono) {
 
     return c.json(
       buildPublicProperty(
-        { ...newProperty, updatedAt: new Date() },
+        { ...newProperty, featuredAt: null, updatedAt: new Date() },
         { name: localityRow.name, area: localityRow.area },
         sellRow,
         rentRow,

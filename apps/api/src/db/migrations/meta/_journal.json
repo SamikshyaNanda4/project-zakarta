@@ -29,6 +29,13 @@
       "when": 1775544910539,
       "tag": "0003_complete_thaddeus_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1744000000000,
+      "tag": "0004_add_featured_at",
+      "breakpoints": true
     }
   ]
 }

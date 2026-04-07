@@ -121,8 +121,8 @@ CREATE TABLE "sell_amenity" (
 	CONSTRAINT "sell_amenity_property_sell_id_name_pk" PRIMARY KEY("property_sell_id","name")
 );
 --> statement-breakpoint
-ALTER TABLE "property" ALTER COLUMN "listing_type" SET DATA TYPE "public"."listing_type" USING "listing_type"::"public"."listing_type";--> statement-breakpoint
 ALTER TABLE "property" ALTER COLUMN "listing_type" DROP DEFAULT;--> statement-breakpoint
+ALTER TABLE "property" ALTER COLUMN "listing_type" SET DATA TYPE "public"."listing_type" USING "listing_type"::"public"."listing_type";--> statement-breakpoint
 ALTER TABLE "property" ADD COLUMN "locality_id" text NOT NULL;--> statement-breakpoint
 ALTER TABLE "property" ADD COLUMN "title" text NOT NULL;--> statement-breakpoint
 ALTER TABLE "property_photo" ADD CONSTRAINT "property_photo_property_id_property_id_fk" FOREIGN KEY ("property_id") REFERENCES "public"."property"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
