@@ -200,8 +200,8 @@ function ToggleButton({
       onClick={onClick}
       className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
         active
-          ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm"
-          : "border-input bg-background text-muted-foreground hover:border-indigo-300"
+          ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
+          : "border-input bg-background text-muted-foreground hover:border-emerald-300"
       }`}
     >
       {children}
@@ -266,7 +266,7 @@ function SectionCard({
         status === "saved"
           ? "border-emerald-200 bg-emerald-50/50"
           : status === "active"
-            ? "border-indigo-300 shadow-md"
+            ? "border-emerald-400 shadow-md"
             : "border-border bg-muted/30 opacity-60"
       }`}
     >
@@ -281,7 +281,7 @@ function SectionCard({
               status === "saved"
                 ? "bg-emerald-500 text-white"
                 : status === "active"
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-emerald-600 text-white"
                   : "bg-muted-foreground/30 text-muted-foreground"
             }`}
           >
@@ -315,7 +315,7 @@ function SectionCard({
                 type="button"
                 onClick={onSave}
                 disabled={saving}
-                className="bg-indigo-600 hover:bg-indigo-700 min-w-[130px]"
+                className="bg-emerald-600 hover:bg-emerald-700 min-w-[130px]"
               >
                 {saving ? (
                   <>
@@ -641,7 +641,7 @@ export function CreatePropertyForm() {
   if (isPending) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-7 w-7 animate-spin text-indigo-600" />
+        <Loader2 className="h-7 w-7 animate-spin text-emerald-600" />
       </div>
     );
   }
@@ -670,7 +670,7 @@ export function CreatePropertyForm() {
               Post another listing
             </Button>
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-emerald-600 hover:bg-emerald-700"
               onClick={() => router.push("/")}
             >
               Browse listings
@@ -688,7 +688,7 @@ export function CreatePropertyForm() {
       <Card className="shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Building2 className="h-5 w-5 text-indigo-600" />
+            <Building2 className="h-5 w-5 text-emerald-600" />
             Post Your Property
           </CardTitle>
           <CardDescription>
@@ -704,8 +704,8 @@ export function CreatePropertyForm() {
                 onClick={() => form.setValue("listingType", type)}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 text-sm font-semibold transition-all ${
                   listingType === type
-                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm"
-                    : "border-input bg-background text-muted-foreground hover:border-indigo-200"
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
+                    : "border-input bg-background text-muted-foreground hover:border-emerald-200"
                 }`}
               >
                 {type === "sell" ? (
@@ -720,7 +720,7 @@ export function CreatePropertyForm() {
                   </>
                 )}
                 {listingType === type && (
-                  <Badge className="ml-1 bg-indigo-600 text-[10px] h-4 px-1.5">Active</Badge>
+                  <Badge className="ml-1 bg-emerald-600 text-[10px] h-4 px-1.5">Active</Badge>
                 )}
               </button>
             ))}
@@ -735,7 +735,7 @@ export function CreatePropertyForm() {
           <SectionCard
             number={1}
             title="Locality"
-            icon={<MapPin className="h-4 w-4 text-indigo-500" />}
+            icon={<MapPin className="h-4 w-4 text-emerald-500" />}
             status={sectionStatus[0]!}
             onExpand={() => expandSection(0)}
             onSave={() => saveSection(0, section1Fields)}
@@ -807,7 +807,7 @@ export function CreatePropertyForm() {
           <SectionCard
             number={2}
             title="About Property"
-            icon={<Building2 className="h-4 w-4 text-indigo-500" />}
+            icon={<Building2 className="h-4 w-4 text-emerald-500" />}
             status={sectionStatus[1]!}
             onExpand={() => expandSection(1)}
             onSave={() => saveSection(1, section2Fields)}
@@ -1083,7 +1083,7 @@ export function CreatePropertyForm() {
           <SectionCard
             number={3}
             title={isSell ? "Sale Details" : "Rent Details"}
-            icon={<IndianRupee className="h-4 w-4 text-indigo-500" />}
+            icon={<IndianRupee className="h-4 w-4 text-emerald-500" />}
             status={sectionStatus[2]!}
             onExpand={() => expandSection(2)}
             onSave={() =>
@@ -1386,7 +1386,7 @@ export function CreatePropertyForm() {
           <SectionCard
             number={4}
             title="Amenities"
-            icon={<Tag className="h-4 w-4 text-indigo-500" />}
+            icon={<Tag className="h-4 w-4 text-emerald-500" />}
             status={sectionStatus[3]!}
             onExpand={() => expandSection(3)}
             onSave={() => saveSection(3, section4Fields)}
@@ -1640,7 +1640,7 @@ export function CreatePropertyForm() {
             <SectionCard
               number={5}
               title="Additional Info"
-              icon={<CheckCircle2 className="h-4 w-4 text-indigo-500" />}
+              icon={<CheckCircle2 className="h-4 w-4 text-emerald-500" />}
               status={sectionStatus[4]!}
               onExpand={() => expandSection(4)}
               onSave={() => saveSection(4, section5Fields)}
@@ -1795,7 +1795,7 @@ export function CreatePropertyForm() {
           <SectionCard
             number={isSell ? 6 : 5}
             title="Gallery"
-            icon={<Camera className="h-4 w-4 text-indigo-500" />}
+            icon={<Camera className="h-4 w-4 text-emerald-500" />}
             status={sectionStatus[isSell ? 5 : 4]!}
             onExpand={() => expandSection(isSell ? 5 : 4)}
             onSave={() => {
@@ -1830,7 +1830,7 @@ export function CreatePropertyForm() {
               onClick={onSubmit}
               disabled={isSubmitting}
               size="lg"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-base font-semibold py-6"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-base font-semibold py-6"
             >
               {isSubmitting ? (
                 <>

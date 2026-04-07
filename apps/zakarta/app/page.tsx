@@ -12,9 +12,9 @@ export const products = [
   },
   {
     id: 2,
-    name: "Animal",
-    description: "A picture of an animal that depicts negligance towards what is happening in the real world",
-    image:"https://images.unsplash.com/photo-1774314706341-041341ae7af5?q=80&w=1025&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    name: "Puri Heritage Apartments",
+    description: "Reverberation of the Old Puri Heritage",
+    image:"https://images.unsplash.com/photo-1655352710727-6c89536454b3?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   }
   // Add more products...
 ]
