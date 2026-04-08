@@ -15,6 +15,9 @@ import axios, {
   isAxiosError,
 } from "axios";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+
 export function createHttpClient(baseURL: string) {
   const instance = axios.create({
     baseURL,
@@ -59,8 +62,7 @@ export function createHttpClient(baseURL: string) {
 }
 
 /**
- * Browser-side HTTP client.
- * Points at the Next.js BFF layer (/api/*) — safe to import in "use client"
- * components.
+ * Axios client for client components — hits the Hono API directly.
+ * withCredentials: true ensures session cookies are sent.
  */
-export const http = createHttpClient("/api");
+export const http = createHttpClient(API_URL);

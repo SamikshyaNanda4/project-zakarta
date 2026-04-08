@@ -6,6 +6,7 @@ import { cors } from "hono/cors";
 
 const app = new OpenAPIHono();
 
+//global OnError Handler
 app.onError((err, c) => {
   console.error("[API Error]", err);
   return c.json({ error: "Internal server error" }, 500);
@@ -17,7 +18,7 @@ app.use(
     credentials: true,
   })
 );
-
+//there
 // Leading slash is required — "api/auth/**" would never match /api/auth/...
 app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 registerRoutes(app);

@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 import { PropertyDetailClient } from "@/components/property-detail-client";
 import type { PropertyPublic } from "@/api";
-import { serverHttp } from "@/api/server";
+import { API_URL } from "@/lib/env";
 
-// Server component: fetches property data, delegates contact reveal to client
 export default async function PropertyDetailPage({
   params,
 }: {
@@ -13,7 +12,9 @@ export default async function PropertyDetailPage({
 
   let property!: PropertyPublic;
   try {
-    property = await serverHttp.GET<PropertyPublic>(`/properties/${id}`);
+    const res = await fetch(`${API_URL}/properties/${id}`, { cache: "no-store" });
+    if (!res.ok) notFound();
+    property = await res.json();
   } catch {
     notFound();
   }

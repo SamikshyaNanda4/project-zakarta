@@ -1,6 +1,6 @@
 /**
- * Properties + Localities resource — browser-side.
- * All calls go through the Next.js BFF layer (/api/*).
+ * Properties + Localities resource — client components only.
+ * Hits the Hono API directly via the axios http client.
  */
 
 import { http } from "../http";
@@ -13,7 +13,7 @@ import type {
 } from "../types";
 
 export const properties = {
-  /** GET /api/properties */
+  /** GET /properties */
   list(params?: {
     listingType?: "sell" | "rent";
     area?: string;
@@ -56,24 +56,24 @@ export const properties = {
     return http.GET<PropertyListResponse>(`/properties${qs ? `?${qs}` : ""}`);
   },
 
-  /** GET /api/properties/:id */
+  /** GET /properties/:id */
   find(id: string): Promise<PropertyPublic> {
     return http.GET<PropertyPublic>(`/properties/${id}`);
   },
 
-  /** POST /api/properties/:id/contact */
+  /** POST /properties/:id/contact */
   getContact(id: string): Promise<ContactResponse> {
     return http.POST<ContactResponse>(`/properties/${id}/contact`);
   },
 
-  /** POST /api/properties */
+  /** POST /properties */
   create(body: CreatePropertyBody): Promise<PropertyPublic> {
     return http.POST<PropertyPublic>("/properties", body);
   },
 };
 
 export const localities = {
-  /** GET /api/localities?area= */
+  /** GET /localities?area= */
   list(area: "Bhubaneswar" | "Cuttack" | "Puri"): Promise<LocalityListResponse> {
     return http.GET<LocalityListResponse>(`/localities?area=${encodeURIComponent(area)}`);
   },

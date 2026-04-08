@@ -45,7 +45,7 @@ const PROPERTY_AGE_OPTIONS = [
   { label: "10+ years", value: "10 plus" },
 ];
 
-const BATHROOM_OPTIONS = [1, 2, 3, 4];
+const BATHROOM_OPTIONS = [1, 2, 3, 4, 5];
 
 // Max price in Lakhs for sell, thousands for rent
 const PRICE_MAX_SELL = 1000; // 10 Cr = 1000L
@@ -521,7 +521,7 @@ export function PropertiesFilterBar({
                         : "bg-white text-gray-600 border-gray-200 hover:border-emerald-400"
                     }`}
                   >
-                    {n}+
+                    {n}
                   </button>
                 ))}
               </div>

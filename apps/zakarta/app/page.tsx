@@ -41,7 +41,6 @@ export default async function HomePage() {
     <>
       <ProductCarousel products={products} />
 
-      {/* ── Hero search ──────────────────────────────────────────────── */}
       <section className="bg-gradient-to-b from-emerald-50/60 to-white py-10 px-4">
         <div className="mx-auto max-w-3xl">
           <p className="text-center text-xs font-semibold tracking-widest text-emerald-600 uppercase mb-2">
@@ -55,7 +54,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Featured Properties ──────────────────────────────────────── */}
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-6">
           <div>

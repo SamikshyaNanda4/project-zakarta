@@ -14,8 +14,8 @@ export type {
   ApiError,
 } from "./types";
 
-// HTTP helpers
-export { http, createHttpClient } from "./http";
+// HTTP client (client components only)
+export { http } from "./http";
 
-// Resource objects
+// Resource objects (client components only)
 export { properties, localities } from "./resources/properties";
