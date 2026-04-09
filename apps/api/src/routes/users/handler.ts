@@ -1,8 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { createUserRoute, getUserRoute } from "./route";
 
+//depricated routes because user routes is handled by Better-Auth now
+//This was written before better auth was presented into the api system
+
 export function UserRoutes(app: OpenAPIHono) {
-  // POST /users — create a new user
   app.openapi(createUserRoute, (c) => {
     const { name, email } = c.req.valid("json");
 
@@ -12,7 +14,6 @@ export function UserRoutes(app: OpenAPIHono) {
     return c.json(newUser, 201);
   });
 
-  // GET /users/:id — fetch a user by ID
   app.openapi(getUserRoute, (c) => {
     const { id } = c.req.valid("param");
 

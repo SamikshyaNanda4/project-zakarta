@@ -10,7 +10,7 @@ export const UserParamsSchema = z.object({
 export const UserResponseSchema = z.object({
   id: z.string().openapi({ example: "123" }),
   name: z.string().openapi({ example: "Jane Doe" }),
-  email: z.string().email().openapi({ example: "jane@example.com" }),
+  email: z.email().openapi({ example: "jane@example.com" }),
 });
 
 export const CreateUserBodySchema = z.object({
@@ -21,5 +21,5 @@ export const CreateUserBodySchema = z.object({
 export const CreateUserResponseSchema = z.object({
   id: z.string().openapi({ example: "456" }),
   name: z.string().openapi({ example: "John Doe" }),
-  email: z.string().email().openapi({ example: "john@example.com" }),
+  email: z.email().openapi({ example: "john@example.com" }),
 });

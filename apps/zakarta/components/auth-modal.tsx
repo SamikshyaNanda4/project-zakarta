@@ -9,7 +9,7 @@ type Tab = "sign-in" | "sign-up";
 type AuthModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  /** Called with the user after successful authentication */
+  /** Called with the user after successful  THIS IS EVERYONE SHOULD USE CUZ GIVEN BY AUTHCLIENT FROM BETTER-AUTH */
   onSuccess: () => void;
   defaultTab?: Tab;
 };
@@ -27,7 +27,6 @@ export function AuthModal({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setTab(defaultTab);
@@ -38,7 +37,6 @@ export function AuthModal({
     }
   }, [isOpen, defaultTab]);
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -102,7 +100,6 @@ export function AuthModal({
         aria-hidden="true"
       />
 
-      {/* Modal */}
       <div
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
         role="dialog"
@@ -130,8 +127,6 @@ export function AuthModal({
               ? "Sign in to view property contact details."
               : "Sign up to unlock property contact details."}
           </p>
-
-          {/* Tabs */}
           <div className="mb-6 flex rounded-lg bg-gray-100 p-1">
             {(["sign-in", "sign-up"] as Tab[]).map((t) => (
               <button

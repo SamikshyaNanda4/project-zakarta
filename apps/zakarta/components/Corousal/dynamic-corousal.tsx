@@ -64,7 +64,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black bg-opacity-40">
-              {/* Shop Now: top-right on mobile, left-center (after chevron) on md+ */}
+              
               <button
                 className="absolute top-4 left-4 md:top-1/2 md:-translate-y-1/2 md:left-20 md:right-auto bg-white text-black font-bold py-2 px-6 rounded-full hover:bg-gray-200 transition duration-300"
                 onMouseEnter={() => setPaused(true)}
@@ -72,7 +72,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
               >
                 Explore
               </button>
-              {/* Name + description: bottom-right, smaller text on mobile */}
+              
               <div className="absolute bottom-14 right-4 md:bottom-16 md:right-10 flex flex-col items-start text-left text-white max-w-[60%] md:max-w-md">
                 <h2 className="text-base md:text-3xl lg:text-4xl font-bold mb-1 md:mb-2">{product.name}</h2>
                 <p className="text-xs md:text-lg lg:text-xl">{product.description}</p>
@@ -82,7 +82,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
         </div>
       ))}
     </div>
-    {/* Navigation arrows */}
+    {/* LEFT RIGH ARROWS */}
     <button
       onClick={prevSlide}
       className="hidden md:block absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 transition duration-300"
@@ -95,7 +95,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
     >
       <ChevronRight className="w-6 h-6 text-black" />
     </button>
-    {/* Dots navigation */}
+    {/* dCLICKABLE DOT NAVIGATIONS */}
     <div className="absolute bottom-4 left-0 right-0">
       <div className="flex items-center justify-center gap-2">
         {products.map((_, i) => (

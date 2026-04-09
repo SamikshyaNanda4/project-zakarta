@@ -18,10 +18,13 @@ export const listPropertiesRoute = createRoute({
   tags: ["Properties"],
   request: {
     query: z.object({
-      listingType: z.enum(["sell", "rent"]).optional().openapi({ example: "sell" }),
+      listingType: z
+        .enum(["sell", "rent"])
+        .optional()
+        .openapi({ example: "sell" }),
       area: z.string().optional().openapi({ example: "Bhubaneswar" }),
       localityId: z.string().optional(),
-      // Comma-separated locality IDs (up to 5)
+      // Comma-separated locality IDs (up to 5 values are there)
       localityIds: z.string().optional().openapi({ example: "loc_1,loc_2" }),
       bhk: z.string().optional().openapi({ example: "2" }),
       homeType: z.string().optional(),
@@ -69,7 +72,8 @@ export const createPropertyRoute = createRoute({
   method: "post",
   path: "/properties",
   summary: "Create a property listing",
-  description: "Creates a new sell or rent listing. Requires auth and allowedToPost flag.",
+  description:
+    "Creates a new sell or rent listing. Requires auth and allowedToPost flag.",
   tags: ["Properties"],
   security: [{ cookieAuth: [] }],
   request: {

@@ -1,10 +1,3 @@
-/**
- * Seed script — localities for Bhubaneswar, Cuttack, Puri.
- *
- * Run with:
- *   pnpm --filter api tsx src/db/seed.ts
- */
-
 import { db } from "./db";
 import { locality } from "./schema";
 
@@ -213,7 +206,6 @@ const bhubaneswarLocalities: string[] = [
   "National Highway 16",
 ];
 
-// Placeholder localities — expand these with real data when available
 const cuttackLocalities: string[] = [
   "Badambadi",
   "Buxi Bazar",
@@ -293,10 +285,7 @@ async function main() {
     });
   });
 
-  await db
-    .insert(locality)
-    .values(rows)
-    .onConflictDoNothing();
+  await db.insert(locality).values(rows).onConflictDoNothing();
 
   console.log(`Seeded ${rows.length} localities.`);
   process.exit(0);

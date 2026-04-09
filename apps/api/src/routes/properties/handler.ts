@@ -79,14 +79,18 @@ export function PropertyRoutes(app: OpenAPIHono) {
       pageSize = 20,
     } = c.req.valid("query");
 
-    // Build DB-level where conditions
+    //  DB-level where conditions
     const conditions = [];
     if (listingType) conditions.push(eq(property.listingType, listingType));
     if (featured === "true") conditions.push(isNotNull(property.featuredAt));
 
-    // Locality filtering: localityIds (comma-sep, up to 5) takes precedence over localityId
+    // Locality filtering: localityIds (comma-sepzarated, up to 5)
     if (localityIds) {
-      const ids = localityIds.split(",").slice(0, 5).map((s) => s.trim()).filter(Boolean);
+      const ids = localityIds
+        .split(",")
+        .slice(0, 5)
+        .map((s) => s.trim())
+        .filter(Boolean);
       if (ids.length > 0) conditions.push(inArray(property.localityId, ids));
     } else if (localityId) {
       conditions.push(eq(property.localityId, localityId));
@@ -106,29 +110,60 @@ export function PropertyRoutes(app: OpenAPIHono) {
     // In-memory filters for fields on sell/rent detail tables
     let filtered = rows;
     if (area) filtered = filtered.filter((r) => r.locality.area === area);
-    if (bhk) filtered = filtered.filter((r) => (r.sellDetails?.bhk ?? r.rentDetails?.bhk) === bhk);
-    if (homeType) filtered = filtered.filter((r) => (r.sellDetails?.homeType ?? r.rentDetails?.homeType) === homeType);
-    if (furnished) filtered = filtered.filter((r) => (r.sellDetails?.furnishedStatus ?? r.rentDetails?.furnished) === furnished);
-    if (parking) filtered = filtered.filter((r) => (r.sellDetails?.parking ?? r.rentDetails?.parking) === parking);
-    if (propertyAge) filtered = filtered.filter((r) => (r.sellDetails?.propertyAge ?? r.rentDetails?.propertyAge) === propertyAge);
-    if (bathrooms) filtered = filtered.filter((r) => (r.sellDetails?.bathrooms ?? r.rentDetails?.bathrooms) === bathrooms);
+    if (bhk)
+      filtered = filtered.filter(
+        (r) => (r.sellDetails?.bhk ?? r.rentDetails?.bhk) === bhk
+      );
+    if (homeType)
+      filtered = filtered.filter(
+        (r) => (r.sellDetails?.homeType ?? r.rentDetails?.homeType) === homeType
+      );
+    if (furnished)
+      filtered = filtered.filter(
+        (r) =>
+          (r.sellDetails?.furnishedStatus ?? r.rentDetails?.furnished) ===
+          furnished
+      );
+    if (parking)
+      filtered = filtered.filter(
+        (r) => (r.sellDetails?.parking ?? r.rentDetails?.parking) === parking
+      );
+    if (propertyAge)
+      filtered = filtered.filter(
+        (r) =>
+          (r.sellDetails?.propertyAge ?? r.rentDetails?.propertyAge) ===
+          propertyAge
+      );
+    if (bathrooms)
+      filtered = filtered.filter(
+        (r) =>
+          (r.sellDetails?.bathrooms ?? r.rentDetails?.bathrooms) === bathrooms
+      );
     if (priceMin != null) {
       filtered = filtered.filter((r) => {
-        const price = r.sellDetails?.expectedPrice ?? r.rentDetails?.expectedRent;
+        const price =
+          r.sellDetails?.expectedPrice ?? r.rentDetails?.expectedRent;
         return price != null && parseFloat(price) >= priceMin!;
       });
     }
     if (priceMax != null) {
       filtered = filtered.filter((r) => {
-        const price = r.sellDetails?.expectedPrice ?? r.rentDetails?.expectedRent;
+        const price =
+          r.sellDetails?.expectedPrice ?? r.rentDetails?.expectedRent;
         return price != null && parseFloat(price) <= priceMax!;
       });
     }
     if (builtUpAreaMin != null) {
-      filtered = filtered.filter((r) => r.sellDetails != null && r.sellDetails.builtUpArea >= builtUpAreaMin!);
+      filtered = filtered.filter(
+        (r) =>
+          r.sellDetails != null && r.sellDetails.builtUpArea >= builtUpAreaMin!
+      );
     }
     if (builtUpAreaMax != null) {
-      filtered = filtered.filter((r) => r.sellDetails != null && r.sellDetails.builtUpArea <= builtUpAreaMax!);
+      filtered = filtered.filter(
+        (r) =>
+          r.sellDetails != null && r.sellDetails.builtUpArea <= builtUpAreaMax!
+      );
     }
 
     const total = filtered.length;
@@ -226,7 +261,9 @@ export function PropertyRoutes(app: OpenAPIHono) {
         totalFloors: body.totalFloors,
         expectedPrice: String(body.expectedPrice),
         availableFrom: body.availableFrom,
-        maintenanceCost: body.maintenanceCost ? String(body.maintenanceCost) : null,
+        maintenanceCost: body.maintenanceCost
+          ? String(body.maintenanceCost)
+          : null,
         description: body.description ?? null,
         kitchenType: body.kitchenType ?? null,
         furnishedStatus: body.furnishedStatus ?? null,
@@ -244,27 +281,90 @@ export function PropertyRoutes(app: OpenAPIHono) {
         availabilityStartTime: body.availabilityStartTime ?? null,
         availabilityEndTime: body.availabilityEndTime ?? null,
       };
-      const [inserted] = await db.insert(propertySell).values(insertSell).returning();
+      const [inserted] = await db
+        .insert(propertySell)
+        .values(insertSell)
+        .returning();
       sellRow = inserted!;
 
       // Insert sell amenities
       const { amenities } = body;
       const amenityRows: Array<typeof sellAmenity.$inferInsert> = [
-        { propertySellId: sellId, name: "gym", value: amenities.gym ? "yes" : "no" },
-        { propertySellId: sellId, name: "powerBackup", value: amenities.powerBackup },
-        { propertySellId: sellId, name: "gatedSociety", value: amenities.gatedSociety ? "yes" : "no" },
-        { propertySellId: sellId, name: "clubHouse", value: amenities.clubHouse ? "yes" : "no" },
-        { propertySellId: sellId, name: "lift", value: amenities.lift ? "yes" : "no" },
-        { propertySellId: sellId, name: "intercom", value: amenities.intercom ? "yes" : "no" },
-        { propertySellId: sellId, name: "shoppingCenter", value: amenities.shoppingCenter ? "yes" : "no" },
-        { propertySellId: sellId, name: "sewageTreatment", value: amenities.sewageTreatment ? "yes" : "no" },
-        { propertySellId: sellId, name: "gasPipeline", value: amenities.gasPipeline ? "yes" : "no" },
-        { propertySellId: sellId, name: "swimmingPool", value: amenities.swimmingPool ? "yes" : "no" },
-        { propertySellId: sellId, name: "fireSafety", value: amenities.fireSafety ? "yes" : "no" },
-        { propertySellId: sellId, name: "childrenPlayArea", value: amenities.childrenPlayArea ? "yes" : "no" },
-        { propertySellId: sellId, name: "park", value: amenities.park ? "yes" : "no" },
-        { propertySellId: sellId, name: "visitorParking", value: amenities.visitorParking ? "yes" : "no" },
-        { propertySellId: sellId, name: "internetServices", value: amenities.internetServices ? "yes" : "no" },
+        {
+          propertySellId: sellId,
+          name: "gym",
+          value: amenities.gym ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "powerBackup",
+          value: amenities.powerBackup,
+        },
+        {
+          propertySellId: sellId,
+          name: "gatedSociety",
+          value: amenities.gatedSociety ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "clubHouse",
+          value: amenities.clubHouse ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "lift",
+          value: amenities.lift ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "intercom",
+          value: amenities.intercom ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "shoppingCenter",
+          value: amenities.shoppingCenter ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "sewageTreatment",
+          value: amenities.sewageTreatment ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "gasPipeline",
+          value: amenities.gasPipeline ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "swimmingPool",
+          value: amenities.swimmingPool ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "fireSafety",
+          value: amenities.fireSafety ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "childrenPlayArea",
+          value: amenities.childrenPlayArea ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "park",
+          value: amenities.park ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "visitorParking",
+          value: amenities.visitorParking ? "yes" : "no",
+        },
+        {
+          propertySellId: sellId,
+          name: "internetServices",
+          value: amenities.internetServices ? "yes" : "no",
+        },
       ];
       await db.insert(sellAmenity).values(amenityRows);
     } else {
@@ -302,14 +402,20 @@ export function PropertyRoutes(app: OpenAPIHono) {
         currentCondition: body.currentCondition,
         directionDescription: body.directionDescription ?? null,
       };
-      const [inserted] = await db.insert(propertyRent).values(insertRent).returning();
+      const [inserted] = await db
+        .insert(propertyRent)
+        .values(insertRent)
+        .returning();
       rentRow = inserted!;
 
       // Insert rent amenities
       const { amenities } = body;
-      const amenityRows: Array<typeof rentAmenity.$inferInsert> = Object.entries(amenities).map(
-        ([name, value]) => ({ propertyRentId: rentId, name, value: value as boolean })
-      );
+      const amenityRows: Array<typeof rentAmenity.$inferInsert> =
+        Object.entries(amenities).map(([name, value]) => ({
+          propertyRentId: rentId,
+          name,
+          value: value as boolean,
+        }));
       await db.insert(rentAmenity).values(amenityRows);
     }
 
