@@ -459,10 +459,8 @@ export function CreatePropertyForm() {
 
   const isSell = listingType === "sell";
 
-  // Determine which sections to show
   const totalSections = isSell ? 6 : 5;
 
-  // Section field maps for validation
   const section1Fields: (keyof FormValues)[] = ["area", "localityId"];
   const section2Fields: (keyof FormValues)[] = [
     "title",
@@ -488,7 +486,7 @@ export function CreatePropertyForm() {
     : [];
 
   async function onSubmit() {
-    // Validate entire form before submit
+    // Validate eTHE WHOLE FORM  BefoRE Submit
     const valid = await form.trigger();
     if (!valid) {
       const errors = form.formState.errors;
@@ -637,7 +635,7 @@ export function CreatePropertyForm() {
     }
   }
 
-  // ── Loading ──────────────────────────────────────────────────────────────────
+  //Loading 
   if (isPending) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -646,7 +644,7 @@ export function CreatePropertyForm() {
     );
   }
 
-  // ── Success ──────────────────────────────────────────────────────────────────
+  //Success
   if (isSuccess) {
     return (
       <Card className="border-emerald-200 bg-emerald-50 shadow-md">
@@ -681,7 +679,7 @@ export function CreatePropertyForm() {
     );
   }
 
-  // ── Form ─────────────────────────────────────────────────────────────────────
+  // Forms
   return (
     <div className="space-y-4">
       {/* Listing type picker */}
@@ -730,8 +728,7 @@ export function CreatePropertyForm() {
 
       <Form {...form}>
         <form noValidate className="space-y-3">
-
-          {/* ── SECTION 1: Locality ─────────────────────────────────────────── */}
+          
           <SectionCard
             number={1}
             title="Locality"
@@ -803,7 +800,6 @@ export function CreatePropertyForm() {
             </div>
           </SectionCard>
 
-          {/* ── SECTION 2: About Property ───────────────────────────────────── */}
           <SectionCard
             number={2}
             title="About Property"
@@ -812,7 +808,6 @@ export function CreatePropertyForm() {
             onExpand={() => expandSection(1)}
             onSave={() => saveSection(1, section2Fields)}
           >
-            {/* Title */}
             <FormField
               control={form.control}
               name="title"
@@ -827,7 +822,6 @@ export function CreatePropertyForm() {
               )}
             />
 
-            {/* Home Type */}
             <FormField
               control={form.control}
               name="homeType"
@@ -853,7 +847,6 @@ export function CreatePropertyForm() {
               )}
             />
 
-            {/* Apartment/Gated Name */}
             {(homeType === "apartment" || homeType === "gated_community_villa") && (
               <FormField
                 control={form.control}

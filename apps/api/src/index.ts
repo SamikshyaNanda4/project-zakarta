@@ -10,3 +10,5 @@ serve({ fetch: app.fetch, port: env.API_PORT }, (info) => {
     `API auth docs available at http://localhost:${info.port}/api/auth/reference`
   );
 });
+
+//hono api server properly ---- with OpenApi Integration

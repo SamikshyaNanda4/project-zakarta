@@ -19,7 +19,9 @@ export const ErrorSchema = z
 export const PropertyPublicSchema = z
   .object({
     id: z.string().openapi({ example: "prop_abc123" }),
-    title: z.string().openapi({ example: "Spacious 2BHK near Kalinga Stadium" }),
+    title: z
+      .string()
+      .openapi({ example: "Spacious 2BHK near Kalinga Stadium" }),
     listingType: z.enum(["sell", "rent"]).openapi({ example: "sell" }),
     localityId: z.string().openapi({ example: "loc_bbsr_0001" }),
     localityName: z.string().openapi({ example: "Patia" }),
@@ -28,9 +30,9 @@ export const PropertyPublicSchema = z
     userId: z.string().openapi({ example: "user_xyz" }),
     createdAt: z.string().openapi({ example: "2026-04-07T10:00:00.000Z" }),
     featuredAt: z.string().nullable().openapi({ example: null }),
-    // sell fields (nullable when rent)
+    // sell fields are nullable when rent is there in this place
     expectedPrice: z.string().nullable().openapi({ example: "45.00" }),
-    // rent fields (nullable when sell)
+    // rent fields are nullable when sell is there in the place
     expectedRent: z.string().nullable().openapi({ example: null }),
     description: z.string().nullable(),
     homeType: z.string().nullable(),
@@ -96,7 +98,11 @@ const PhotoInputSchema = z.object({
 export const CreateSellPropertyBodySchema = z
   .object({
     listingType: z.literal("sell"),
-    title: z.string().min(5).max(120).openapi({ example: "Spacious 2BHK in Patia" }),
+    title: z
+      .string()
+      .min(5)
+      .max(120)
+      .openapi({ example: "Spacious 2BHK in Patia" }),
     contact: z.string().min(10).max(15).openapi({ example: "+91 98765 43210" }),
     localityId: z.string().min(1),
     // About
@@ -111,7 +117,13 @@ export const CreateSellPropertyBodySchema = z
     ownershipType: z.enum(["self", "on_loan"]),
     builtUpArea: z.number().int().min(1),
     carpetArea: z.number().int().min(1),
-    propertyAge: z.enum(["<1yr", "1-3 years", "4-7 years", "7-10 years", "10 plus"]),
+    propertyAge: z.enum([
+      "<1yr",
+      "1-3 years",
+      "4-7 years",
+      "7-10 years",
+      "10 plus",
+    ]),
     facing: z
       .enum([
         "north",
@@ -125,7 +137,13 @@ export const CreateSellPropertyBodySchema = z
         "dont_know",
       ])
       .optional(),
-    floorType: z.enum(["vitrified_tiles", "mosaic", "marble_granite", "cement", "wooden"]),
+    floorType: z.enum([
+      "vitrified_tiles",
+      "mosaic",
+      "marble_granite",
+      "cement",
+      "wooden",
+    ]),
     floorNumber: z.number().int().optional(),
     totalFloors: z.number().int().min(1),
     // Sale details
@@ -134,12 +152,22 @@ export const CreateSellPropertyBodySchema = z
     maintenanceCost: z.number().optional(),
     description: z.string().max(1000).optional(),
     kitchenType: z.enum(["modular", "covered", "open_shelves"]).optional(),
-    furnishedStatus: z.enum(["fully_furnished", "semi_furnished", "unfurnished"]).optional(),
+    furnishedStatus: z
+      .enum(["fully_furnished", "semi_furnished", "unfurnished"])
+      .optional(),
     parking: z.enum(["bike", "car", "both", "none"]).optional(),
     // Amenities section
     bathrooms: z.number().int().min(1).max(10000),
     kitchens: z.number().int().min(1).max(10000),
-    whoShows: z.enum(["i", "neighbours", "friends", "relative", "security", "tenant", "others"]),
+    whoShows: z.enum([
+      "i",
+      "neighbours",
+      "friends",
+      "relative",
+      "security",
+      "tenant",
+      "others",
+    ]),
     currentStatus: z
       .enum([
         "vacant",
@@ -152,7 +180,9 @@ export const CreateSellPropertyBodySchema = z
       .optional(),
     amenities: SellAmenitiesSchema,
     // Additional info
-    khataCertificate: z.enum(["a_khata", "b_khata", "no", "dont_know"]).optional(),
+    khataCertificate: z
+      .enum(["a_khata", "b_khata", "no", "dont_know"])
+      .optional(),
     allotmentLetter: z.enum(["yes", "no", "dont_know"]).optional(),
     saleDeedCertificate: z.enum(["yes", "no", "dont_know"]).optional(),
     paidPropertyTax: z.enum(["yes", "no", "dont_know"]).optional(),
@@ -168,15 +198,29 @@ export const CreateSellPropertyBodySchema = z
 export const CreateRentPropertyBodySchema = z
   .object({
     listingType: z.literal("rent"),
-    title: z.string().min(5).max(120).openapi({ example: "2BHK for rent in Sailashree Vihar" }),
+    title: z
+      .string()
+      .min(5)
+      .max(120)
+      .openapi({ example: "2BHK for rent in Sailashree Vihar" }),
     contact: z.string().min(10).max(15).openapi({ example: "+91 98765 43210" }),
     localityId: z.string().min(1),
     // About
-    homeType: z.enum(["apartment", "independent_house", "gated_community_villa"]),
+    homeType: z.enum([
+      "apartment",
+      "independent_house",
+      "gated_community_villa",
+    ]),
     bhk: z.enum(["1RK", "1", "2", "3", "4", "5+"]),
     floorNumber: z.number().int().optional(),
     totalFloors: z.number().int().min(1),
-    propertyAge: z.enum(["<1yr", "1-3 years", "4-7 years", "7-10 years", "10 plus"]),
+    propertyAge: z.enum([
+      "<1yr",
+      "1-3 years",
+      "4-7 years",
+      "7-10 years",
+      "10 plus",
+    ]),
     facing: z
       .enum([
         "north",
@@ -190,7 +234,13 @@ export const CreateRentPropertyBodySchema = z
         "dont_know",
       ])
       .optional(),
-    floorType: z.enum(["vitrified_tiles", "mosaic", "marble_granite", "cement", "wooden"]),
+    floorType: z.enum([
+      "vitrified_tiles",
+      "mosaic",
+      "marble_granite",
+      "cement",
+      "wooden",
+    ]),
     availableForLease: z.boolean().default(true),
     // Rent details
     expectedRent: z.number().positive(),
@@ -199,7 +249,13 @@ export const CreateRentPropertyBodySchema = z
     monthlyMaintenanceAmount: z.number().optional(),
     availableFrom: z.string().min(1),
     preferredTenants: z.array(
-      z.enum(["anyone", "family", "female_bachelor", "male_bachelor", "company"])
+      z.enum([
+        "anyone",
+        "family",
+        "female_bachelor",
+        "male_bachelor",
+        "company",
+      ])
     ),
     furnished: z.enum(["fully_furnished", "semi_furnished", "unfurnished"]),
     parking: z.enum(["bike", "car", "both", "none"]).optional(),
@@ -212,7 +268,15 @@ export const CreateRentPropertyBodySchema = z
     gym: z.boolean().default(false),
     nonVegAllowed: z.boolean().default(false),
     gatedSecurity: z.boolean().default(false),
-    whoShows: z.enum(["i", "neighbours", "friends", "relative", "security", "tenant", "others"]),
+    whoShows: z.enum([
+      "i",
+      "neighbours",
+      "friends",
+      "relative",
+      "security",
+      "tenant",
+      "others",
+    ]),
     currentCondition: z.enum(["vacant", "tenant_on_notice", "new_property"]),
     directionDescription: z.string().max(1000).optional(),
     amenities: RentAmenitiesSchema,

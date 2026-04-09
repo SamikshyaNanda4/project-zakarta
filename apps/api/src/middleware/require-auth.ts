@@ -1,10 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { auth } from "@/lib/auth";
 
-/**
- * Middleware that requires a valid session.
- * Sets `user` and `session` in the Hono context for downstream handlers.
- */
 export const requireAuth = createMiddleware<{
   Variables: {
     user: typeof auth.$Infer.Session.user;
@@ -24,10 +20,6 @@ export const requireAuth = createMiddleware<{
   await next();
 });
 
-/**
- * Middleware that requires the user to have `allowedToPost = true`.
- * Must be applied AFTER `requireAuth`.
- */
 export const requireAllowedToPost = createMiddleware<{
   Variables: {
     user: typeof auth.$Infer.Session.user;

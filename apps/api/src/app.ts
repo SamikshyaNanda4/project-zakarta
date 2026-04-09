@@ -18,7 +18,7 @@ app.use(
     credentials: true,
   })
 );
-//there
+//there is an important point below for the freelance force team
 // Leading slash is required — "api/auth/**" would never match /api/auth/...
 app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 registerRoutes(app);
