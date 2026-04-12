@@ -209,14 +209,50 @@ function ToggleButton({
   );
 }
 
+// ─────────────────────────────────────────────
+// AMENITIES ICONS
+// ─────────────────────────────────────────────
+
+const amenityIcons: Record<string, React.ReactNode> = {
+  // COMMON (SELL + RENT)
+  gym: <img src="/icons/gym.svg" className="h-4 w-4" alt="gym" />,
+  lift: <img src="/icons/lift.svg" className="h-4 w-4" alt="lift" />,
+  intercom: <img src="/icons/intercom.svg" className="h-4 w-4" alt="intercom" />,
+  clubHouse: <img src="/icons/club.svg" className="h-4 w-4" alt="club" />,
+  swimmingPool: <img src="/icons/pool.svg" className="h-4 w-4" alt="pool" />,
+  fireSafety: <img src="/icons/fire.svg" className="h-4 w-4" alt="fire" />,
+  shoppingCenter: <img src="/icons/shoppingcenter.svg" className="h-4 w-4" alt="shop" />,
+  park: <img src="/icons/park.svg" className="h-4 w-4" alt="park" />,
+  sewageTreatment: <img src="/icons/sewage.svg" className="h-4 w-4" alt="water" />,
+  gasPipeline: <img src="/icons/gas.svg" className="h-4 w-4" alt="gas" />,
+  childrenPlayArea: <img src="/icons/playarea.svg" className="h-4 w-4" alt="play" />,
+  visitorParking: <img src="/icons/parking.svg" className="h-4 w-4" alt="parking" />,
+  internetServices: <img src="/icons/internet.svg" className="h-4 w-4" alt="wifi" />,
+
+  // SELL ONLY
+  gatedSociety: <img src="/icons/gated.svg" className="h-4 w-4" alt="gated" />,
+
+  // RENT ONLY
+  petAllowed: <img src="/icons/pet.svg" className="h-4 w-4" alt="pet" />,
+  nonVegAllowed: <img src="/icons/meat.svg" className="h-4 w-4" alt="food" />,
+  gatedSecurity: <img src="/icons/gated.svg" className="h-4 w-4" alt="security" />,
+  ac: <img src="/icons/ac.svg" className="h-4 w-4" alt="ac" />,
+  rainwaterHarvesting: <img src="/icons/rainwater.svg" className="h-4 w-4" alt="rain" />,
+  houseKeeping: <img src="/icons/housekeeping.svg" className="h-4 w-4" alt="clean" />,
+  washingMachine: <img src="/icons/washingmachine.svg" className="h-4 w-4" alt="wash" />,
+  laundry: <img src="/icons/laundry.svg" className="h-4 w-4" alt="laundry" />,
+};
+
 function CheckToggle({
   checked,
   onChange,
   label: lbl,
+  icon,
 }: {
   checked: boolean;
   onChange: (v: boolean) => void;
   label: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <button
@@ -229,7 +265,12 @@ function CheckToggle({
       }`}
     >
       {checked && <CheckCheck className="h-3.5 w-3.5" />}
-      {lbl}
+
+      {/* ICON */}
+      {icon}
+
+      {/* LABEL */}
+      <span>{lbl}</span>
     </button>
   );
 }
@@ -1594,6 +1635,7 @@ export function CreatePropertyForm() {
                         checked={!!field.value}
                         onChange={field.onChange}
                         label={lbl}
+                        icon={amenityIcons[key]}
                       />
                     )}
                   />
