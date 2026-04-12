@@ -18,10 +18,11 @@ export default function NotFound() {
           The page you're looking for doesn’t exist or may have been moved.
         </p>
 
-        <Link href="/">
-          <button className="w-full sm:w-auto bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-md hover:opacity-90 transition text-sm sm:text-base">
+        <Link 
+        href="/"
+        className="w-full sm:w-auto bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-md hover:opacity-90 transition text-sm sm:text-base"
+        >
             Go Back Home
-          </button>
         </Link>
 
       </div>
