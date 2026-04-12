@@ -213,34 +213,35 @@ function ToggleButton({
 // AMENITIES ICONS
 // ─────────────────────────────────────────────
 
+const amenityIcon = (src: string) => (
+  <img src={src} className="h-4 w-4" alt="" aria-hidden="true" />
+);
 const amenityIcons: Record<string, React.ReactNode> = {
   // COMMON (SELL + RENT)
-  gym: <img src="/icons/gym.svg" className="h-4 w-4" alt="gym" />,
-  lift: <img src="/icons/lift.svg" className="h-4 w-4" alt="lift" />,
-  intercom: <img src="/icons/intercom.svg" className="h-4 w-4" alt="intercom" />,
-  clubHouse: <img src="/icons/club.svg" className="h-4 w-4" alt="club" />,
-  swimmingPool: <img src="/icons/pool.svg" className="h-4 w-4" alt="pool" />,
-  fireSafety: <img src="/icons/fire.svg" className="h-4 w-4" alt="fire" />,
-  shoppingCenter: <img src="/icons/shoppingcenter.svg" className="h-4 w-4" alt="shop" />,
-  park: <img src="/icons/park.svg" className="h-4 w-4" alt="park" />,
-  sewageTreatment: <img src="/icons/sewage.svg" className="h-4 w-4" alt="water" />,
-  gasPipeline: <img src="/icons/gas.svg" className="h-4 w-4" alt="gas" />,
-  childrenPlayArea: <img src="/icons/playarea.svg" className="h-4 w-4" alt="play" />,
-  visitorParking: <img src="/icons/parking.svg" className="h-4 w-4" alt="parking" />,
-  internetServices: <img src="/icons/internet.svg" className="h-4 w-4" alt="wifi" />,
-
+  gym: amenityIcon("/icons/gym.svg"),
+  lift: amenityIcon("/icons/lift.svg"),
+  intercom: amenityIcon("/icons/intercom.svg"),
+  clubHouse: amenityIcon("/icons/club.svg"),
+  swimmingPool: amenityIcon("/icons/pool.svg"),
+  fireSafety: amenityIcon("/icons/fire.svg"),
+  shoppingCenter: amenityIcon("/icons/shoppingcenter.svg"),
+  park: amenityIcon("/icons/park.svg"),
+  sewageTreatment: amenityIcon("/icons/sewage.svg"),
+  gasPipeline: amenityIcon("/icons/gas.svg"),
+  childrenPlayArea: amenityIcon("/icons/playarea.svg"),
+  visitorParking: amenityIcon("/icons/parking.svg"),
+  internetServices: amenityIcon("/icons/internet.svg"),
   // SELL ONLY
-  gatedSociety: <img src="/icons/gated.svg" className="h-4 w-4" alt="gated" />,
-
+  gatedSociety: amenityIcon("/icons/gated.svg"),
   // RENT ONLY
-  petAllowed: <img src="/icons/pet.svg" className="h-4 w-4" alt="pet" />,
-  nonVegAllowed: <img src="/icons/meat.svg" className="h-4 w-4" alt="food" />,
-  gatedSecurity: <img src="/icons/gated.svg" className="h-4 w-4" alt="security" />,
-  ac: <img src="/icons/ac.svg" className="h-4 w-4" alt="ac" />,
-  rainwaterHarvesting: <img src="/icons/rainwater.svg" className="h-4 w-4" alt="rain" />,
-  houseKeeping: <img src="/icons/housekeeping.svg" className="h-4 w-4" alt="clean" />,
-  washingMachine: <img src="/icons/washingmachine.svg" className="h-4 w-4" alt="wash" />,
-  laundry: <img src="/icons/laundry.svg" className="h-4 w-4" alt="laundry" />,
+  petAllowed: amenityIcon("/icons/pet.svg"),
+  nonVegAllowed: amenityIcon("/icons/meat.svg"),
+  gatedSecurity: amenityIcon("/icons/gated.svg"),
+  ac: amenityIcon("/icons/ac.svg"),
+  rainwaterHarvesting: amenityIcon("/icons/rainwater.svg"),
+  houseKeeping: amenityIcon("/icons/housekeeping.svg"),
+  washingMachine: amenityIcon("/icons/washingmachine.svg"),
+  laundry: amenityIcon("/icons/laundry.svg"),
 };
 
 function CheckToggle({
