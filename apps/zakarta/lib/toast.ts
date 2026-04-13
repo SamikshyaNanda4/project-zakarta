@@ -22,8 +22,8 @@ export function showToast(
       break;
 
     case "info":
-    default:
-      toast(message, { description });
+      toast.info(message, { description }); 
+      break;
   }
 }
 
