@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import {
+  toastSuccess,
+  toastError,
+  toastInfo,
+  toastWarning,
+  toastLoading,
+} from "@/lib/toast";
 import type { PropertyPublic } from "@/api";
 import { properties } from "@/api";
 import { authClient } from "@/lib/auth-client";
@@ -45,7 +51,7 @@ export function PropertiesListClient({ initialProperties }: Props) {
           [pendingContactPropertyId]: data.contact,
         }));
       } catch {
-        toast.error("Sorry, the contact is unable to be given right now. Thanks for understanding!");
+        toastError("Sorry, the contact is unable to be given right now. Thanks for understanding!");
       }
     }
 
