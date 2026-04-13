@@ -209,14 +209,51 @@ function ToggleButton({
   );
 }
 
+// ─────────────────────────────────────────────
+// AMENITIES ICONS
+// ─────────────────────────────────────────────
+
+const amenityIcon = (src: string) => (
+  <img src={src} className="h-4 w-4" alt="" aria-hidden="true" />
+);
+const amenityIcons: Record<string, React.ReactNode> = {
+  // COMMON (SELL + RENT)
+  gym: amenityIcon("/icons/gym.svg"),
+  lift: amenityIcon("/icons/lift.svg"),
+  intercom: amenityIcon("/icons/intercom.svg"),
+  clubHouse: amenityIcon("/icons/club.svg"),
+  swimmingPool: amenityIcon("/icons/pool.svg"),
+  fireSafety: amenityIcon("/icons/fire.svg"),
+  shoppingCenter: amenityIcon("/icons/shoppingcenter.svg"),
+  park: amenityIcon("/icons/park.svg"),
+  sewageTreatment: amenityIcon("/icons/sewage.svg"),
+  gasPipeline: amenityIcon("/icons/gas.svg"),
+  childrenPlayArea: amenityIcon("/icons/playarea.svg"),
+  visitorParking: amenityIcon("/icons/parking.svg"),
+  internetServices: amenityIcon("/icons/internet.svg"),
+  // SELL ONLY
+  gatedSociety: amenityIcon("/icons/gated.svg"),
+  // RENT ONLY
+  petAllowed: amenityIcon("/icons/pet.svg"),
+  nonVegAllowed: amenityIcon("/icons/meat.svg"),
+  gatedSecurity: amenityIcon("/icons/gated.svg"),
+  ac: amenityIcon("/icons/ac.svg"),
+  rainwaterHarvesting: amenityIcon("/icons/rainwater.svg"),
+  houseKeeping: amenityIcon("/icons/housekeeping.svg"),
+  washingMachine: amenityIcon("/icons/washingmachine.svg"),
+  laundry: amenityIcon("/icons/laundry.svg"),
+};
+
 function CheckToggle({
   checked,
   onChange,
   label: lbl,
+  icon,
 }: {
   checked: boolean;
   onChange: (v: boolean) => void;
   label: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <button
@@ -229,7 +266,12 @@ function CheckToggle({
       }`}
     >
       {checked && <CheckCheck className="h-3.5 w-3.5" />}
-      {lbl}
+
+      {/* ICON */}
+      {icon}
+
+      {/* LABEL */}
+      <span>{lbl}</span>
     </button>
   );
 }
@@ -1594,6 +1636,7 @@ export function CreatePropertyForm() {
                         checked={!!field.value}
                         onChange={field.onChange}
                         label={lbl}
+                        icon={amenityIcons[key]}
                       />
                     )}
                   />
