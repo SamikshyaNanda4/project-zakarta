@@ -51,7 +51,7 @@ export function PropertiesListClient({ initialProperties }: Props) {
           [pendingContactPropertyId]: data.contact,
         }));
       } catch {
-        toastError("Sorry, the contact is unable to be given right now. Thanks for understanding!");
+        toastError("Sorry, contact details are unavailable right now. Please try again shortly.");
       }
     }
 
