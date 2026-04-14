@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import {
+  toastSuccess,
+  toastError,
+  toastInfo,
+  toastWarning,
+  toastLoading,
+} from "@/lib/toast";
 import { Loader2 } from "lucide-react";
 import type { PropertyPublic } from "@/api";
 import { properties } from "@/api";
@@ -75,7 +81,7 @@ export function InfinitePropertyList({
       setTotal(data.total);
       setPage(nextPage);
     } catch {
-      toast.error("Failed to load more properties.");
+      toastError("Failed to load more properties.");
     } finally {
       setLoading(false);
     }
@@ -111,7 +117,7 @@ export function InfinitePropertyList({
           [pendingContactPropertyId]: data.contact,
         }));
       } catch {
-        toast.error("Sorry, the contact is unavailable right now.");
+        toastError("Sorry, the contact is unavailable right now.");
       }
     }
     router.refresh();

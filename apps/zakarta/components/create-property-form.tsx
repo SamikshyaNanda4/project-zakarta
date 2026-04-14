@@ -19,7 +19,13 @@ import {
   Camera,
   CheckCheck,
 } from "lucide-react";
-import { toast } from "sonner";
+import {
+  toastSuccess,
+  toastError,
+  toastInfo,
+  toastWarning,
+  toastLoading,
+} from "@/lib/toast";
 
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
@@ -456,7 +462,7 @@ export function CreatePropertyForm() {
     localities
       .list(area as "Bhubaneswar" | "Cuttack" | "Puri")
       .then((res) => setLocalityList(res.localities))
-      .catch(() => toast.error("Failed to load localities"))
+      .catch(() => toastError("Failed to load localities"))
       .finally(() => setLoadingLocalities(false));
   }, [area, form]);
 
@@ -536,7 +542,7 @@ export function CreatePropertyForm() {
       const msg = firstError && "message" in firstError && firstError.message
         ? String(firstError.message)
         : "Please complete all required sections.";
-      toast.error(msg);
+      toastError(msg);
       return;
     }
 
@@ -656,22 +662,23 @@ export function CreatePropertyForm() {
         await properties.create(body);
       }
 
-      toast.success("Property listed successfully!");
+      toastSuccess("Property listed successfully!");
       setIsSuccess(true);
     } catch (err: unknown) {
       const apiErr = err as { response?: { status?: number; data?: { error?: string } } };
       if (apiErr.response?.status === 401) {
-        toast.error("Authentication required");
+        toastError("Authentication required");
         return;
       }
       if (apiErr.response?.status === 403) {
-        toast.error("Permission denied", {
-          description: "Your account is not permitted to post listings.",
-        });
+          toastError(
+            "Permission denied",
+            "Your account is not permitted to post listings."
+          );
         return;
       }
       const msg = apiErr.response?.data?.error ?? "Something went wrong. Please try again.";
-      toast.error("Failed to post listing", { description: msg });
+      toastError("Failed to post listing", msg);
     } finally {
       setIsSubmitting(false);
     }
