@@ -10,7 +10,8 @@ const NAV_LINKS = [
   { href: "/", label: "Properties" },
 ];
 
-const SELL_RENT_PATH = "/properties/new";
+// const SELL_RENT_PATH = "/properties/new";
+const SELL_RENT_PATH = "/CreatePropertyForm";
 
 export function NavbarWrapper() {
   const { data: session } = authClient.useSession();
