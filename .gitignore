@@ -40,3 +40,7 @@ yarn-error.log*
 *.pem
 
 next-env.d.ts
+
+./apps/zakarta/components/create-property-form.tsx
+
+# project-zakarta\apps\zakarta\components\create-property-form.tsx
