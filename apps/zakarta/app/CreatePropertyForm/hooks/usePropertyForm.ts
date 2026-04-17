@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, type Resolver, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import { properties, localities } from "@/api";
@@ -151,20 +151,16 @@ export function usePropertyForm() {
   const s3Fields = isSell ? section3FieldsSell : section3FieldsRent;
   const s5Fields = section5Fields(isSell);
 
-  async function onSubmit() {
-    const valid = await form.trigger();
-    if (!valid) {
-      const errors = form.formState.errors;
-      const firstError = Object.values(errors)[0];
-      const msg =
-        firstError && "message" in firstError && firstError.message
-          ? String(firstError.message)
-          : "Please complete all required sections.";
-      toastError(msg);
-      return;
-    }
+  function onInvalid(errors: FieldErrors<FormValues>) {
+    const firstError = Object.values(errors)[0];
+    const msg =
+      firstError && "message" in firstError && firstError.message
+        ? String(firstError.message)
+        : "Please complete all required sections.";
+    toastError(msg);
+  }
 
-    const values = form.getValues();
+  async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
 
     try {
@@ -316,7 +312,7 @@ export function usePropertyForm() {
     saveSection,
     expandSection,
     resetForm,
-    onSubmit,
+    handleSubmit: form.handleSubmit(onSubmit, onInvalid),
     // field groups
     section1Fields,
     s2Fields,

@@ -38,7 +38,7 @@ export function CreatePropertyForm() {
     saveSection,
     expandSection,
     resetForm,
-    onSubmit,
+    handleSubmit,
     section1Fields,
     s2Fields,
     s3Fields,
@@ -136,7 +136,7 @@ export function CreatePropertyForm() {
 
       {/* ── Sections ────────────────────────────────────────────────────────── */}
       <Form {...form}>
-        <form noValidate className="space-y-3">
+        <form noValidate onSubmit={handleSubmit} className="space-y-3">
 
           <Section1Locality
             form={form}
@@ -197,8 +197,7 @@ export function CreatePropertyForm() {
           {/* ── Submit ─────────────────────────────────────────────────────── */}
           <div className="pt-2">
             <Button
-              type="button"
-              onClick={onSubmit}
+              type="submit"
               disabled={isSubmitting}
               size="lg"
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-base font-semibold py-6"
