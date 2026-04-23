@@ -1,0 +1,27 @@
+FROM node:20-alpine AS base
+WORKDIR /usr/app
+# Enable pnpm via corepack (built into Node 16+)
+RUN corepack enable
+
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY ./turbo.json ./turbo.json
+COPY apps/zakarta/package.json                        ./apps/zakarta/package.json
+
+COPY packages/shared/package.json                 ./packages/shared/package.json
+COPY packages/ui/package.json                    ./packages/ui/package.json
+COPY packages/typescript-config/package.json      ./packages/typescript-config/package.json
+COPY packages/eslint-config/package.json          ./packages/eslint-config/package.json
+
+RUN pnpm install --frozen-lockfile
+
+COPY apps/zakarta/        ./apps/zakarta/
+COPY packages/shared/ ./packages/shared/
+COPY packages/typescript-config/ ./packages/typescript-config/
+COPY packages/ui/     ./packages/ui/
+
+RUN pnpm --filter @repo/shared build
+RUN pnpm run build:zakarta 
+
+EXPOSE 3000
+
+CMD ["pnpm", "--filter", "zakarta", "start"]

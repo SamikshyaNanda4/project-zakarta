@@ -2,9 +2,9 @@
   "name": "tbr",
   "private": true,
   "scripts": {
-    "dev:web": "pnpm --filter web dev",
+    "dev:zakarta": "pnpm --filter zakarta dev",
     "dev:api": "pnpm --filter api dev",
-    "build:web": "pnpm --filter web build",
+    "build:zakarta": "pnpm --filter zakarta build",
     "build:api": "pnpm --filter api build",
     "start": "pnpm run --parallel start",
     "build": "turbo run build",
