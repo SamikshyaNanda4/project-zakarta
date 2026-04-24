@@ -71,7 +71,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: ./docker/Dockerfile.web
+          file: ./docker/Dockerfile.zakarta
           push: true
           tags: |
             samikshyananda4/zkt-ui:latest
