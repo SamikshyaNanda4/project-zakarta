@@ -7,13 +7,13 @@ import * as schema from "@/db/schema";
 
 const trustedOrigins =
   env.NODE_ENV === "production"
-    ? [`{${env.FRONTEND_URL}}`]
+    ? [env.FRONTEND_URL]
     : [`http://localhost:${env.FRONTEND_PORT}`];
 
 export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
-  basePath: "/auth",
+  basePath: "/api/auth",
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -43,10 +43,12 @@ export const auth = betterAuth({
   ...(env.NODE_ENV === "production" && {
     cookies: {
       domain: ".levelvein.online",
-      sameSite: "none" as const,
-      secure: true,
+      sameSite: "lax" as const,
+      secure: false,
     },
   }),
 });
 
 export type Session = typeof auth.$Infer.Session;
+//      sameSite: "lax" or "none" as const,
+//      secure: true,
