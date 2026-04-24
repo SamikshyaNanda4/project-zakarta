@@ -16,6 +16,7 @@ import {
 
 // ─────────────────────────────────────────────
 // AUTH TABLES (unchanged)
+
 // ─────────────────────────────────────────────
 
 export const user = pgTable("user", {
@@ -255,7 +256,10 @@ export const propertySell = pgTable("property_sell", {
   floorType: floorTypeEnum("floor_type").notNull(),
   floorNumber: integer("floor_number"),
   totalFloors: integer("total_floors").notNull(),
-  expectedPrice: decimal("expected_price", { precision: 14, scale: 2 }).notNull(),
+  expectedPrice: decimal("expected_price", {
+    precision: 14,
+    scale: 2,
+  }).notNull(),
   availableFrom: date("available_from").notNull(),
   maintenanceCost: decimal("maintenance_cost", { precision: 14, scale: 2 }),
   description: text("description"),
@@ -295,7 +299,10 @@ export const propertyRent = pgTable("property_rent", {
   floorType: floorTypeEnum("floor_type").notNull(),
   availableForLease: boolean("available_for_lease").default(true),
   expectedRent: decimal("expected_rent", { precision: 14, scale: 2 }).notNull(),
-  expectedDeposit: decimal("expected_deposit", { precision: 14, scale: 2 }).notNull(),
+  expectedDeposit: decimal("expected_deposit", {
+    precision: 14,
+    scale: 2,
+  }).notNull(),
   monthlyMaintenanceExtra: boolean("monthly_maintenance_extra").default(false),
   monthlyMaintenanceAmount: decimal("monthly_maintenance_amount", {
     precision: 14,
@@ -400,21 +407,27 @@ export const propertyRelations = relations(property, ({ one, many }) => ({
   photos: many(propertyPhoto),
 }));
 
-export const propertySellRelations = relations(propertySell, ({ one, many }) => ({
-  property: one(property, {
-    fields: [propertySell.propertyId],
-    references: [property.id],
-  }),
-  amenities: many(sellAmenity),
-}));
+export const propertySellRelations = relations(
+  propertySell,
+  ({ one, many }) => ({
+    property: one(property, {
+      fields: [propertySell.propertyId],
+      references: [property.id],
+    }),
+    amenities: many(sellAmenity),
+  })
+);
 
-export const propertyRentRelations = relations(propertyRent, ({ one, many }) => ({
-  property: one(property, {
-    fields: [propertyRent.propertyId],
-    references: [property.id],
-  }),
-  amenities: many(rentAmenity),
-}));
+export const propertyRentRelations = relations(
+  propertyRent,
+  ({ one, many }) => ({
+    property: one(property, {
+      fields: [propertyRent.propertyId],
+      references: [property.id],
+    }),
+    amenities: many(rentAmenity),
+  })
+);
 
 export const sellAmenityRelations = relations(sellAmenity, ({ one }) => ({
   propertySell: one(propertySell, {

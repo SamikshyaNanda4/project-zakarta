@@ -10,13 +10,9 @@
  * always human-readable.
  */
 
-import axios, {
-  type AxiosRequestConfig,
-  isAxiosError,
-} from "axios";
+import axios, { type AxiosRequestConfig, isAxiosError } from "axios";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export function createHttpClient(baseURL: string) {
   const instance = axios.create({
@@ -43,15 +39,27 @@ export function createHttpClient(baseURL: string) {
       return instance.get<T>(path, config).then((r) => r.data);
     },
 
-    POST<T>(path: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    POST<T>(
+      path: string,
+      body?: unknown,
+      config?: AxiosRequestConfig
+    ): Promise<T> {
       return instance.post<T>(path, body, config).then((r) => r.data);
     },
 
-    PUT<T>(path: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    PUT<T>(
+      path: string,
+      body?: unknown,
+      config?: AxiosRequestConfig
+    ): Promise<T> {
       return instance.put<T>(path, body, config).then((r) => r.data);
     },
 
-    PATCH<T>(path: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    PATCH<T>(
+      path: string,
+      body?: unknown,
+      config?: AxiosRequestConfig
+    ): Promise<T> {
       return instance.patch<T>(path, body, config).then((r) => r.data);
     },
 
