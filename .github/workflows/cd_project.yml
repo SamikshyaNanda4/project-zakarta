@@ -11,6 +11,7 @@ jobs:
     outputs:
       api: ${{ steps.filter.outputs.api }}
       zakarta: ${{ steps.filter.outputs.zakarta }}
+      infra: ${{ steps.filter.outputs.infra }}
     steps:
       - uses: actions/checkout@v4
 
@@ -27,6 +28,9 @@ jobs:
               - 'apps/zakarta/**'
               - 'packages/**'
               - 'docker/Dockerfile.zakarta'
+            infra:
+              - 'docker/docker-compose.prod.yaml'
+              - 'docker/nginx/**'
   build-api:
     needs: changes
     if: needs.changes.outputs.api == 'true'
@@ -93,6 +97,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
+            git -C /home/ubuntu/project-zakarta pull origin ${{ github.ref_name }}
+
             cd /home/ubuntu/project-zakarta
 
             cat > .env <<EOF
@@ -151,4 +157,14 @@ jobs:
               sudo docker compose -f docker/docker-compose.prod.yaml --env-file .env up -d --no-deps zakarta
 
               echo "--> ZAKARTA deployment complete!"
+            fi
+
+            if [ "${{ needs.changes.outputs.infra }}" = "true" ]; then
+              echo "Infra config changed — reloading nginx and recreating api..."
+
+              sudo docker exec zakarta-nginx-prod nginx -s reload
+
+              sudo docker compose -f docker/docker-compose.prod.yaml --env-file .env up -d --force-recreate api
+
+              echo "--> Infra update complete!"
             fi
