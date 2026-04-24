@@ -26,7 +26,7 @@ jobs:
             zakarta:
               - 'apps/zakarta/**'
               - 'packages/**'
-              - 'docker/Dockerfile.api'
+              - 'docker/Dockerfile.zakarta'
   build-api:
     needs: changes
     if: needs.changes.outputs.api == 'true'
