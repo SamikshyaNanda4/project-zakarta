@@ -19,6 +19,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 registerRoutes(app);
 app.doc("/openapi.json", {
