@@ -116,11 +116,39 @@ jobs:
 
 
             if [ "${{ needs.changes.outputs.api }}" = "true" ]; then
+              echo "Cleaning up old API image and container..."
+
+              sudo docker compose -f docker/docker-compose.prod.yaml rm -f -s api
+
+              OLD_IMAGE=$(sudo docker images samikshyananda4/zkt-backend --format "{{.ID}}")
+              if [ ! -z "$OLD_IMAGE" ]; then
+                sudo docker rmi -f $OLD_IMAGE
+                echo " Removed old API image: $OLD_IMAGE"
+              fi
+
+              echo "Pulling new API image..."
               sudo docker compose -f docker/docker-compose.prod.yaml pull api
+              echo "Starting new API container..."
               sudo docker compose -f docker/docker-compose.prod.yaml --env-file .env up -d --no-deps api
+
+              echo "--> API deployment complete!"
             fi
 
             if [ "${{ needs.changes.outputs.zakarta }}" = "true" ]; then
+              echo "Cleaning up old ZAKARATA image and container..."
+
+              sudo docker compose -f docker/docker-compose.prod.yaml rm -f -s zakarta
+
+              OLD_IMAGE=$(sudo docker images samikshyananda4/zkt-ui --format "{{.ID}}")
+              if [ ! -z "$OLD_IMAGE" ]; then
+                sudo docker rmi -f $OLD_IMAGE
+                echo " Removed old ZAKARTA image: $OLD_IMAGE"
+              fi
+
+              echo "Pulling new ZAKARTA image..."
               sudo docker compose -f docker/docker-compose.prod.yaml pull zakarta
+              echo "Starting new API container..."
               sudo docker compose -f docker/docker-compose.prod.yaml --env-file .env up -d --no-deps zakarta
+
+              echo "--> ZAKARTA deployment complete!"
             fi
