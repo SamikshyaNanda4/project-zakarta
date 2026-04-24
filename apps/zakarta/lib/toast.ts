@@ -4,7 +4,7 @@ type ToastType = "success" | "error" | "info" | "warning";
 
 const DEFAULT_DURATION = 4000;
 
-// Main functions
+// Main functionss
 export function showToast(
   type: ToastType,
   message: string,
