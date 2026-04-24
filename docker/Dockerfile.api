@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 WORKDIR /usr/app
 # Enable pnpm via corepack (built into Node 16+)
 RUN corepack enable

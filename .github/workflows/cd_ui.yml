@@ -1,7 +1,7 @@
 ## Build the docker image ,
 ## push the docker image to docker hub
 ##ssh into our VM and start the new image
-name: Continuous Deployment To Backend
+name: Continuous Deployment To UI
 
 on:
   push:

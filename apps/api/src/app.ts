@@ -3,6 +3,7 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { auth } from "./lib/auth";
 import { registerRoutes } from "./routes";
 import { cors } from "hono/cors";
+import { env } from "@repo/shared";
 
 const app = new OpenAPIHono();
 
@@ -14,13 +15,12 @@ app.onError((err, c) => {
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", `${env.FRONTEND_URL}`],
     credentials: true,
   })
 );
-//there is an important point below for the freelance force team
-// Leading slash is required — "api/auth/**" would never match /api/auth/...
-app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
+// nginx strips the /api/ prefix before forwarding, so Hono receives /auth/**
+app.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
 registerRoutes(app);
 app.doc("/openapi.json", {
   openapi: "3.0.0",

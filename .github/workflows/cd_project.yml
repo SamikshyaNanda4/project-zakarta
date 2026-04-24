@@ -1,0 +1,123 @@
+name: Smart Monorepo CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - ZKT-18/19-MonorepoDeployment
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      zakarta: ${{ steps.filter.outputs.zakarta }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'packages/**'
+              - 'docker/Dockerfile.api'
+            zakarta:
+              - 'apps/zakarta/**'
+              - 'packages/**'
+              - 'docker/Dockerfile.api'
+  build-api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: build and push api
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./docker/Dockerfile.api
+          push: true
+          tags: |
+            samikshyananda4/zkt-backend:latest
+            samikshyananda4/zkt-backend:${{ github.sha }}
+
+  build-zakarta:
+    needs: changes
+    if: needs.changes.outputs.zakarta == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Web
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./docker/Dockerfile.web
+          push: true
+          tags: |
+            samikshyananda4/zkt-ui:latest
+            samikshyananda4/zkt-ui:${{ github.sha }}
+
+  deploy:
+    needs: [changes, build-api, build-zakarta]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ubuntu
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/project-zakarta
+
+            cat > .env <<EOF
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            FRONTEND_PORT=3000
+            API_PORT=3001
+            NODE_ENV=production
+            BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}
+
+            BETTER_AUTH_URL=${{ secrets.BACKEND_URL }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            NEXT_PUBLIC_API_URL=${{ secrets.BACKEND_URL }}
+            NEXT_PUBLIC_BETTER_AUTH_URL=${{ secrets.BACKEND_URL }}
+
+            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            BACKEND_URL=${{ secrets.BACKEND_URL }}
+            IMAGE_TAG=${{ github.sha }}
+            EOF
+
+
+            if [ "${{ needs.changes.outputs.api }}" = "true" ]; then
+              sudo docker compose -f docker/docker-compose.prod.yaml pull api
+              sudo docker compose -f docker/docker-compose.prod.yaml --env-file .env up -d --no-deps api
+            fi
+
+            if [ "${{ needs.changes.outputs.zakarta }}" = "true" ]; then
+              sudo docker compose -f docker/docker-compose.prod.yml pull zakarta
+              sudo docker compose -f docker/docker-compose.prod.yml --env-file .env up -d --no-deps zakarta
+            fi
