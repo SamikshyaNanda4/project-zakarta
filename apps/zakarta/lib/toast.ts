@@ -4,7 +4,7 @@ type ToastType = "success" | "error" | "info" | "warning";
 
 const DEFAULT_DURATION = 4000;
 
-// Main function
+// Main functions
 export function showToast(
   type: ToastType,
   message: string,
@@ -50,5 +50,4 @@ export const toastWarning = (msg: string, desc?: string, duration?: number) =>
   showToast("warning", msg, desc, duration);
 
 // Loading toasts are persistent by default (no auto-dismiss)
-export const toastLoading = (msg: string) =>
-  toast.loading(msg);
+export const toastLoading = (msg: string) => toast.loading(msg);
