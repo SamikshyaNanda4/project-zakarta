@@ -13,4 +13,4 @@ serve({ fetch: app.fetch, port: env.API_PORT }, (info) => {
   console.log(`${BASE_URL}/api/auth/reference`);
 });
 
-//hono api server properly ---- with OpenApi Integrationss
+//hono api server properly ---- with OpenApi Integrationsss

@@ -22,6 +22,7 @@ export const products = [
 ];
 
 
+
 async function getFeaturedProperties(): Promise<PropertyListResponse> {
   try {
     const res = await fetch(

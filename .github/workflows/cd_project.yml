@@ -73,6 +73,9 @@ jobs:
           context: .
           file: ./docker/Dockerfile.zakarta
           push: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.BACKEND_URL }}
+            NEXT_PUBLIC_BETTER_AUTH_URL=${{ secrets.BACKEND_URL }}
           tags: |
             samikshyananda4/zkt-ui:latest
             samikshyananda4/zkt-ui:${{ github.sha }}
