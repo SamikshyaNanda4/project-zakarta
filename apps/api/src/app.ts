@@ -19,7 +19,7 @@ app.use(
     credentials: true,
   })
 );
-// nginx strips the /api/ prefix before forwarding, so Hono receives /auth/** ttest
+// nginx strips the /api/ prefix before forwarding, so Hono receives /auth/** ttestt
 app.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
 registerRoutes(app);
 app.doc("/openapi.json", {

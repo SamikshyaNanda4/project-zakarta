@@ -37,7 +37,7 @@ services:
       - internal
 
   zakarta:
-    image: samikshyananda4/zkt-ui:${IMAGE_TAG:?IMAGE_TAG is required}
+    image: samikshyananda4/zkt-ui:${IMAGE_TAG:-latest}
     container_name: zakarta-ui-prod
     restart: unless-stopped
     environment:

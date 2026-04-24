@@ -67,7 +67,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push Web
+      - name: Build & Push Zakarta
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -118,6 +118,6 @@ jobs:
             fi
 
             if [ "${{ needs.changes.outputs.zakarta }}" = "true" ]; then
-              sudo docker compose -f docker/docker-compose.prod.yml pull zakarta
-              sudo docker compose -f docker/docker-compose.prod.yml --env-file .env up -d --no-deps zakarta
+              sudo docker compose -f docker/docker-compose.prod.yaml pull zakarta
+              sudo docker compose -f docker/docker-compose.prod.yaml --env-file .env up -d --no-deps zakarta
             fi
