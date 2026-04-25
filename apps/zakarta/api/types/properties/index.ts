@@ -21,6 +21,7 @@ export type PropertyPublic = {
   description: string | null;
   homeType: string | null;
   photos: PropertyPhoto[];
+  amenities?: string[];
 };
 
 export type PropertyListResponse = {

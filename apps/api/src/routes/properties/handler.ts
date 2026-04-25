@@ -31,11 +31,13 @@ function generateId(prefix: string): string {
 }
 
 function buildPublicProperty(
+  
   row: typeof property.$inferSelect,
   loc: { name: string; area: string },
   sellRow: typeof propertySell.$inferSelect | null,
   rentRow: typeof propertyRent.$inferSelect | null,
-  photos: Array<{ url: string; order: number }>
+  photos: Array<{ url: string; order: number }>,
+  amenities: typeof sellAmenity.$inferSelect[] = [] 
 ) {
   return {
     id: row.id,
@@ -53,6 +55,10 @@ function buildPublicProperty(
     description: sellRow?.description ?? rentRow?.description ?? null,
     homeType: sellRow?.homeType ?? rentRow?.homeType ?? null,
     photos,
+    amenities:
+  amenities
+    ?.filter((a) => a.value === "yes")
+    .map((a) => a.name) ?? [],
   };
 }
 
@@ -99,12 +105,18 @@ export function PropertyRoutes(app: OpenAPIHono) {
     const rows = await db.query.property.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
       orderBy: (p, { desc }) => [desc(p.createdAt)],
-      with: {
-        locality: true,
-        sellDetails: true,
-        rentDetails: true,
-        photos: true,
-      },
+     with: {
+  locality: true,
+
+  sellDetails: {
+    with: {
+      amenities: true   
+    }
+  },
+
+  rentDetails: true,
+  photos: true,
+},
     });
 
     // In-memory filters for fields on sell/rent detail tables
@@ -175,7 +187,9 @@ export function PropertyRoutes(app: OpenAPIHono) {
         { name: r.locality.name, area: r.locality.area },
         r.sellDetails ?? null,
         r.rentDetails ?? null,
-        r.photos.map((p) => ({ url: p.url, order: p.order }))
+        r.photos.map((p) => ({ url: p.url, order: p.order })),
+        (r.sellDetails as any)?.amenities ?? []   // 👈 ADD THIS
+        
       )
     );
 
@@ -190,9 +204,14 @@ export function PropertyRoutes(app: OpenAPIHono) {
       where: eq(property.id, id),
       with: {
         locality: true,
-        sellDetails: true,
+        
         rentDetails: true,
         photos: true,
+        sellDetails: {
+  with: {
+    amenities: true   // 👈 SIRF YAHI SAHI HAI
+  }
+},
       },
     });
 
@@ -204,7 +223,10 @@ export function PropertyRoutes(app: OpenAPIHono) {
         { name: row.locality.name, area: row.locality.area },
         row.sellDetails ?? null,
         row.rentDetails ?? null,
-        row.photos.map((p) => ({ url: p.url, order: p.order }))
+        row.photos.map((p) => ({ url: p.url, order: p.order })),
+        (row.sellDetails as any)?.amenities ?? []
+        
+
       ),
       200
     );
@@ -437,7 +459,8 @@ export function PropertyRoutes(app: OpenAPIHono) {
         { name: localityRow.name, area: localityRow.area },
         sellRow,
         rentRow,
-        (body.photos ?? []).map((p) => ({ url: p.url, order: p.order }))
+        (body.photos ?? []).map((p) => ({ url: p.url, order: p.order })),
+        []
       ),
       201
     );

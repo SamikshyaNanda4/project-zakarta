@@ -1,4 +1,24 @@
 "use client";
+const amenityConfig: Record<string, { label: string; icon: string }> = {
+  gym: { label: "Gym", icon: "/icons/gym.svg" },
+  lift: { label: "Lift", icon: "/icons/lift.svg" },
+  shoppingCenter: { label: "Shopping Center", icon: "/icons/shoppingcenter.svg" },
+  powerBackup: { label: "Power Backup", icon: "/icons/power.svg" }, // check name
+  gatedSociety: { label: "Gated Society", icon: "/icons/gated.svg" },
+  clubHouse: { label: "Club House", icon: "/icons/club.svg" },
+  intercom: { label: "Intercom", icon: "/icons/intercom.svg" },
+  sewageTreatment: { label: "Sewage Treatment", icon: "/icons/sewage.svg" },
+  gasPipeline: { label: "Gas Pipeline", icon: "/icons/gas.svg" },
+  swimmingPool: { label: "Swimming Pool", icon: "/icons/pool.svg" },
+  fireSafety: { label: "Fire Safety", icon: "/icons/fire.svg" },
+  childrenPlayArea: { label: "Play Area", icon: "/icons/playarea.svg" },
+  park: { label: "Park", icon: "/icons/park.svg" },
+  visitorParking: { label: "Parking", icon: "/icons/parking.svg" },
+  internetServices: { label: "Internet", icon: "/icons/internet.svg" },
+};
+
+
+
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -182,17 +202,77 @@ export function PropertyDetailClient({ property }: Props) {
             />
           </div>
 
-          {/* Description */}
-          {property.description && (
-            <div className="mb-6">
-              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-400">
-                Description
-              </h2>
-              <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
-                {property.description}
-              </p>
-            </div>
-          )}
+{/* Description */}
+{property.description && (
+  <div className="mb-6">
+
+    {/* Header + Share button */}
+    <div className="mb-2 flex items-center gap-2">
+
+      <button
+        className="text-xs text-indigo-600 hover:underline"
+        onClick={() => {
+          if (navigator.share) {
+            navigator.share({
+              title: property.title,
+              url: window.location.href,
+            });
+          } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Link copied!");
+          }
+        }}
+      >
+        🔗 Share
+      </button>
+
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
+        Description
+      </h2>
+
+    </div>
+
+    <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
+      {property.description}
+    </p>
+  </div>
+)}
+
+
+{/* Amenities */}
+{property.amenities && property.amenities.length > 0 && (
+  <div className="mb-6">
+    <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">
+      Amenities
+    </h2>
+
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      {property.amenities.map((amenity) => {
+        const config = amenityConfig[amenity];
+
+        return (
+          <div
+            key={amenity}
+            className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 hover:bg-gray-50 transition"
+          >
+            {config?.icon && (
+              <img
+                src={config.icon}
+                alt={config.label}
+                className="h-4 w-4 object-contain"
+              />
+            )}
+            <span className="text-xs font-medium text-gray-700">
+              {config?.label ?? amenity}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
+
+
 
           {/* Contact section */}
           <div className="rounded-xl border border-gray-100 bg-gray-50 p-5">
