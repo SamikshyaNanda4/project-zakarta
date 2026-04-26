@@ -37,7 +37,7 @@ function buildPublicProperty(
   sellRow: typeof propertySell.$inferSelect | null,
   rentRow: typeof propertyRent.$inferSelect | null,
   photos: Array<{ url: string; order: number }>,
-  amenities: typeof sellAmenity.$inferSelect[] = [] 
+  amenities: Array<typeof sellAmenity.$inferSelect | typeof rentAmenity.$inferSelect> = []
 ) {
   return {
     id: row.id,
@@ -57,7 +57,10 @@ function buildPublicProperty(
     photos,
     amenities:
   amenities
-    ?.filter((a) => a.value === "yes")
+    ?.filter((a) => {
+      if (typeof a.value === "boolean") return a.value === true;  // rent
+      return a.value === "yes";                                    // sell
+    })
     .map((a) => a.name) ?? [],
   };
 }
@@ -113,8 +116,13 @@ export function PropertyRoutes(app: OpenAPIHono) {
       amenities: true   
     }
   },
+  
 
-  rentDetails: true,
+  rentDetails: {
+  with: {
+    amenities: true
+  }
+},
   photos: true,
 },
     });
@@ -188,7 +196,10 @@ export function PropertyRoutes(app: OpenAPIHono) {
         r.sellDetails ?? null,
         r.rentDetails ?? null,
         r.photos.map((p) => ({ url: p.url, order: p.order })),
-        (r.sellDetails as any)?.amenities ?? []   // 👈 ADD THIS
+        [
+  ...(r.sellDetails?.amenities ?? []),
+  ...(r.rentDetails?.amenities ?? []),
+]
         
       )
     );
@@ -200,36 +211,43 @@ export function PropertyRoutes(app: OpenAPIHono) {
   app.openapi(getPropertyRoute, async (c) => {
     const { id } = c.req.valid("param");
 
-    const row = await db.query.property.findFirst({
-      where: eq(property.id, id),
-      with: {
-        locality: true,
-        
-        rentDetails: true,
-        photos: true,
-        sellDetails: {
+   const row = await db.query.property.findFirst({
+  where: eq(property.id, id),
   with: {
-    amenities: true   // 👈 SIRF YAHI SAHI HAI
-  }
-},
-      },
-    });
+    locality: true,
+
+    photos: true,
+
+    sellDetails: {
+      with: {
+        amenities: true
+      }
+    },
+
+    rentDetails: {
+      with: {
+        amenities: true   // 👈 ADD THIS (IMPORTANT)
+      }
+    },
+  },
+});
 
     if (!row) return c.json({ error: "Property not found" }, 404);
 
     return c.json(
-      buildPublicProperty(
-        row,
-        { name: row.locality.name, area: row.locality.area },
-        row.sellDetails ?? null,
-        row.rentDetails ?? null,
-        row.photos.map((p) => ({ url: p.url, order: p.order })),
-        (row.sellDetails as any)?.amenities ?? []
-        
-
-      ),
-      200
-    );
+  buildPublicProperty(
+    row,
+    { name: row.locality.name, area: row.locality.area },
+    row.sellDetails ?? null,
+    row.rentDetails ?? null,
+    row.photos.map((p) => ({ url: p.url, order: p.order })),
+    [
+      ...(row.sellDetails?.amenities ?? []),
+      ...(row.rentDetails?.amenities ?? []),
+    ]
+  ),
+  200
+);
   });
 
   // ── POST /properties (protected) ─────────────────────────────────────────────

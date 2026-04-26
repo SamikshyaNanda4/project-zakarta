@@ -3,18 +3,33 @@ const amenityConfig: Record<string, { label: string; icon: string }> = {
   gym: { label: "Gym", icon: "/icons/gym.svg" },
   lift: { label: "Lift", icon: "/icons/lift.svg" },
   shoppingCenter: { label: "Shopping Center", icon: "/icons/shoppingcenter.svg" },
-  powerBackup: { label: "Power Backup", icon: "/icons/power.svg" }, // check name
+
+  powerBackup: { label: "Power Backup", icon: "/icons/power.svg" }, // ⚠️ NOTE: file missing (see below)
+
   gatedSociety: { label: "Gated Society", icon: "/icons/gated.svg" },
   clubHouse: { label: "Club House", icon: "/icons/club.svg" },
   intercom: { label: "Intercom", icon: "/icons/intercom.svg" },
+
   sewageTreatment: { label: "Sewage Treatment", icon: "/icons/sewage.svg" },
   gasPipeline: { label: "Gas Pipeline", icon: "/icons/gas.svg" },
   swimmingPool: { label: "Swimming Pool", icon: "/icons/pool.svg" },
   fireSafety: { label: "Fire Safety", icon: "/icons/fire.svg" },
+
   childrenPlayArea: { label: "Play Area", icon: "/icons/playarea.svg" },
   park: { label: "Park", icon: "/icons/park.svg" },
-  visitorParking: { label: "Parking", icon: "/icons/parking.svg" },
-  internetServices: { label: "Internet", icon: "/icons/internet.svg" },
+
+  visitorParking: { label: "Visitor Parking", icon: "/icons/parking.svg" },
+  internetServices: { label: "Internet Services", icon: "/icons/internet.svg" },
+
+  // EXTRA icons (jo tumhare folder me hai but use nahi ho rahe the)
+  ac: { label: "Air Conditioning", icon: "/icons/ac.svg" },
+  garden: { label: "Garden", icon: "/icons/garden.svg" },
+  houseKeeping: { label: "Housekeeping", icon: "/icons/housekeeping.svg" },
+  laundry: { label: "Laundry", icon: "/icons/laundry.svg" },
+  meat: { label: "Non-Veg Allowed", icon: "/icons/meat.svg" },
+  pet: { label: "Pet Friendly", icon: "/icons/pet.svg" },
+  rainwaterHarvesting: { label: "Rainwater Harvesting", icon: "/icons/rainwater.svg" },
+  washingMachine: { label: "Washing Machine", icon: "/icons/washingmachine.svg" },
 };
 
 
