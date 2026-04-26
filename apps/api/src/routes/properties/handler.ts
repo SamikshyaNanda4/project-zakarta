@@ -57,10 +57,11 @@ function buildPublicProperty(
     photos,
     amenities:
   amenities
-    ?.filter((a) => {
-      if (typeof a.value === "boolean") return a.value === true;  // rent
-      return a.value === "yes";                                    // sell
-    })
+    ?.filter((a) =>
+      typeof a.value === "boolean"
+        ? a.value
+        : a.value === "yes"
+    )
     .map((a) => a.name) ?? [],
   };
 }
