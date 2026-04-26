@@ -43,12 +43,12 @@ export const auth = betterAuth({
   ...(env.NODE_ENV === "production" && {
     cookies: {
       domain: ".levelvein.online",
-      sameSite: "lax" as const,
-      secure: false,
+      sameSite: "none" as const,
+      secure: true,
     },
   }),
 });
 
 export type Session = typeof auth.$Infer.Session;
 //      sameSite: "lax" or "none" as const,
-//      secure: true,
+//      secure: false,
