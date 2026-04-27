@@ -20,6 +20,7 @@ export type NavbarProps = {
   onSignOut?: () => void;
   appName?: string;
   onSellRent?: () => void;
+  pathname?: string;
 };
 
 export function Navbar({
@@ -28,8 +29,13 @@ export function Navbar({
   onSignOut,
   appName = "Zakarta",
   onSellRent,
+  pathname,
 }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [propOpen, setPropOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +48,7 @@ export function Navbar({
         .slice(0, 2)
     : null;
 
+  // Avatar click outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
@@ -52,17 +59,15 @@ export function Navbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [avatarOpen]);
 
+  // Lock scroll
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
 
+  // Close menu on resize
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth >= 768) setMenuOpen(false);
@@ -70,6 +75,45 @@ export function Navbar({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Hover logic
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setPropOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setPropOpen(false);
+    }, 200);
+  };
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  // Reset on route change
+  useEffect(() => {
+    setPropOpen(false);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, [pathname]);
+
+  const resetDropdown = () => {
+    setPropOpen(false);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
 
   const AvatarIcon = ({ size = "sm" }: { size?: "sm" | "md" }) => {
     const cls = size === "md" ? "h-10 w-10 text-base" : "h-6 w-6 text-xs";
@@ -90,218 +134,213 @@ export function Navbar({
 
   return (
     <>
-      {/* Spacer so page content doesn't hide under the fixed navbar */}
       <div className="h-14" />
 
-      {/* Fixed navbar — avoids iOS Safari sticky+click bug */}
-      <nav
-        className="fixed top-0 left-0 right-0 z-40 h-14 w-full border-b border-gray-200 bg-white"
-        style={{ WebkitOverflowScrolling: "touch" }}
-      >
+      <nav className="fixed top-0 left-0 right-0 z-40 h-14 w-full border-b border-gray-200 bg-white">
         <div className="mx-auto flex h-full max-w-8xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Logo */}
-          <div className="flex items-center justify-start">
+
+          {/* LEFT */}
+          <div className="flex items-center">
             <a
-            href="/"
-            className="shrink-0 cursor-pointer text-xl font-bold tracking-tight text-gray-900 ml-8"
-          >
-            {appName}
-          </a>
+              href="/"
+              onMouseDown={resetDropdown}
+              className="text-xl font-bold text-gray-900 ml-8"
+            >
+              {appName}
+            </a>
 
-          {/* Desktop nav links */}
-          {links.length > 0 && (
-            <ul className="hidden items-center gap-1 md:flex ml-16">
-              {links.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            <ul className="hidden md:flex items-center gap-1 ml-16">
+
+              {/* Properties */}
+              <li
+                className="relative"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  onClick={() => setPropOpen((prev) => !prev)}
+                  onFocus={() => setPropOpen(true)}
+                  onBlur={() => {
+                    setTimeout(() => setPropOpen(false), 150);
+                  }}
+                  aria-haspopup="menu"
+                  aria-expanded={propOpen}
+                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                >
+                  Properties
+                </button>
+
+                {propOpen && (
+                  <div
+                    role="menu"
+                    className="absolute left-0 top-full mt-2 w-56 rounded-xl border bg-white py-2 shadow-lg z-50"
                   >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-          </div>
+                    
+                    <div className="absolute top-[-8px] left-0 w-full h-2" />
 
-          {/* Right side */}
+                    <a
+                      href="/properties?listingType=sell"
+                      role="menuitem"
+                      tabIndex={0}
+                      onClick={() => {
+                        resetDropdown();
+                      }}
+                      className="block px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      Buy Property
+                    </a>
+
+                    <a
+                      href="/properties?listingType=rent"
+                      role="menuitem"
+                      tabIndex={0}
+                      onClick={() => {
+                        resetDropdown();
+                      }}
+                      className="block px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      Rent Property
+                    </a>
+
+                    <a
+                      role="menuitem"
+                      tabIndex={0}
+                      onClick={() => {
+                        resetDropdown();
+                        onSellRent?.();
+                      }}
+                      className="block px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      Sell Property
+                    </a>
+                  </div>
+                )}
+              </li>
+
+              {/* About */}
+             <li
+                className="relative"
+                onMouseEnter={() => setAboutOpen(true)}
+                onMouseLeave={() => setTimeout(() => setAboutOpen(false), 200)}
+              >
+                <button
+                  onClick={() => setAboutOpen((prev) => !prev)}
+                  onFocus={() => setAboutOpen(true)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) {
+                      setAboutOpen(false);
+                    }
+                  }}
+                  aria-expanded={aboutOpen}
+                  className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+                >
+                  About
+                </button>
+
+                {aboutOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-48 bg-white shadow p-3 rounded">
+                    <div className="absolute top-[-8px] left-0 w-full h-2" />
+                    <p className="text-sm text-gray-600">
+                      Zakarta helps you find and list properties easily.
+                    </p>
+                  </div>
+                )}
+              </li>
+
+              {/* Contact */}
+              <li
+                className="relative"
+                onMouseEnter={() => setContactOpen(true)}
+                onMouseLeave={() => setTimeout(() => setContactOpen(false), 200)}
+              >
+                <button
+                  onClick={() => setContactOpen((prev) => !prev)}
+                  onFocus={() => setContactOpen(true)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) {
+                      setContactOpen(false);
+                    }
+                  }}
+                  aria-expanded={contactOpen}
+                  className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+                >
+                  Contact
+                </button>
+
+                {contactOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-48 bg-white shadow p-3 rounded">
+                    <div className="absolute top-[-8px] left-0 w-full h-2" />
+                    <p className="text-sm text-gray-600">
+                      support@zakarta.com
+                    </p>
+                  </div>
+                )}
+              </li>
+        </ul> 
+       </div>        
+          {/* RIGHT */}
           <div className="flex items-center gap-2">
-            {/* Sell/Rent CTA — always visible on desktop */}
+
             {onSellRent && (
               <button
-                type="button"
                 onClick={onSellRent}
-                className="hidden cursor-pointer rounded-sm border border-white bg-emerald-400 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600 md:block"
+                className="hidden md:block bg-emerald-400 px-4 py-1.5 text-sm text-white rounded hover:bg-emerald-600"
               >
                 Sell / Rent Your Property
               </button>
             )}
 
-            {/* Desktop: user dropdown */}
             {user ? (
               <div ref={avatarRef} className="relative hidden md:block">
                 <button
-                  type="button"
                   onClick={() => setAvatarOpen((v) => !v)}
-                  aria-expanded={avatarOpen}
-                  aria-haspopup="true"
-                  className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full border hover:bg-gray-100"
                 >
-                  <AvatarIcon size="sm" />
-                  <span className="max-w-[120px] truncate">{user.name}</span>
-                  <ChevronDown
-                    className={`h-3 w-3 opacity-60 transition-transform duration-200 ${avatarOpen ? "rotate-180" : ""}`}
-                  />
+                  <AvatarIcon />
+                  <ChevronDown className="h-3 w-3" />
                 </button>
 
                 {avatarOpen && (
-                  <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
-                    <div className="border-b border-gray-100 px-4 py-2.5">
-                      <p className="truncate text-xs font-semibold text-gray-900">{user.name}</p>
-                      <p className="truncate text-xs text-gray-500">{user.email}</p>
-                    </div>
+                  <div className="absolute right-0 mt-2 w-48 bg-white shadow rounded">
                     <button
-                      type="button"
-                      onClick={() => { setAvatarOpen(false); onSignOut?.(); }}
-                      className="flex w-full cursor-pointer items-center gap-2 px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
+                      onClick={onSignOut}
+                      className="w-full px-3 py-2 text-red-600"
                     >
-                      <LogOut className="h-4 w-4" />
                       Sign out
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="hidden items-center gap-2 md:flex">
-                <a
-                  href="/sign-in"
-                  className="cursor-pointer rounded-sm px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:underline"
-                >
-                  Login
-                </a>
-                <a
-                  href="/sign-up"
-                  className="cursor-pointer rounded-sm bg-gray-100 px-2 py-1.5 text-sm font-medium text-emerald-950 transition-colors hover:bg-emerald-200 hover:underline"
-                >
-                  Sign up
-                </a>
+              <div className="hidden md:flex gap-2">
+                <a href="/sign-in">Login</a>
+                <a href="/sign-up">Sign up</a>
               </div>
             )}
 
-            {/* Hamburger — always visible on mobile */}
-            <button
-              type="button"
-              onClick={() => setMenuOpen((v) => !v)}
-              aria-expanded={menuOpen}
-              aria-label="Toggle menu"
-              className="cursor-pointer rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 md:hidden"
-            >
-              <Menu className="h-5 w-5" />
+            <button onClick={() => setMenuOpen(true)} className="md:hidden">
+              <Menu />
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Backdrop */}
+      {/* MOBILE */}
       {menuOpen && (
-        <div
-          onClick={() => setMenuOpen(false)}
-          className="fixed inset-0 z-50 bg-black/40 md:hidden"
-        />
-      )}
+        <div className="fixed inset-0 bg-white p-6 z-50">
+          <button onClick={() => setMenuOpen(false)}>
+            <X />
+          </button>
 
-      {/* Sidebar drawer — only in DOM when open, slides in from left */}
-      {menuOpen && (
-        <aside className="fixed inset-y-0 left-0 z-[60] flex w-[90%] max-w-sm flex-col bg-white shadow-2xl md:hidden">
-          {/* Sidebar header */}
-          <div className="flex h-14 items-center justify-between border-b border-gray-100 px-5">
-            <a
-              href="/"
-              onClick={() => setMenuOpen(false)}
-              className="cursor-pointer text-xl font-bold tracking-tight text-gray-900"
-            >
-              {appName}
-            </a>
-            <button
-              type="button"
-              onClick={() => setMenuOpen(false)}
-              aria-label="Close menu"
-              className="cursor-pointer rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100"
-            >
-              <X className="h-5 w-5" />
-            </button>
+          <div className="flex flex-col gap-4 mt-6">
+            <a href="/properties?listingType=sell">Buy</a>
+            <a href="/properties?listingType=rent">Rent</a>
+            <a href="/properties/new">Sell</a>
+            <hr />
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
           </div>
-
-          {/* Sidebar body */}
-          <div className="flex flex-1 flex-col overflow-y-auto px-4 py-4">
-            {links.length > 0 && (
-              <ul className="space-y-1">
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="block cursor-pointer rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {onSellRent && (
-              <button
-                type="button"
-                onClick={() => { setMenuOpen(false); onSellRent(); }}
-                className="mt-3 w-full cursor-pointer rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2.5 text-left text-sm font-medium text-indigo-700 transition-colors hover:bg-indigo-100"
-              >
-                Sell / Rent Your Property
-              </button>
-            )}
-          </div>
-
-          {/* Sidebar footer: auth */}
-          <div className="border-t border-gray-100 px-4 py-4">
-            {user ? (
-              <div className="space-y-1">
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-                  <AvatarIcon size="md" />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-gray-900">{user.name}</p>
-                    <p className="truncate text-xs text-gray-500">{user.email}</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => { setMenuOpen(false); onSignOut?.(); }}
-                  className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign out
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <a
-                  href="/sign-in"
-                  onClick={() => setMenuOpen(false)}
-                  className="block cursor-pointer rounded-lg px-3 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
-                >
-                  Sign in
-                </a>
-                <a
-                  href="/sign-up"
-                  onClick={() => setMenuOpen(false)}
-                  className="block cursor-pointer rounded-lg bg-indigo-600 px-3 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-indigo-700"
-                >
-                  Sign up
-                </a>
-              </div>
-            )}
-          </div>
-        </aside>
+        </div>
       )}
     </>
   );

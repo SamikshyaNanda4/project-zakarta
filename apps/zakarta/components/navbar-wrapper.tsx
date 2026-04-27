@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Navbar } from "@repo/ui/components/navbar";
 import { authClient } from "@/lib/auth-client";
 import { AuthModal } from "@/components/auth-modal";
+import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
   { href: "/", label: "Properties" },
@@ -16,7 +17,8 @@ export function NavbarWrapper() {
   const { data: session } = authClient.useSession();
   const router = useRouter();
   const [authModalOpen, setAuthModalOpen] = useState(false);
-
+  const pathname = usePathname();
+  
   const user = session?.user
     ? {
         name: session.user.name,
@@ -53,6 +55,7 @@ export function NavbarWrapper() {
         onSignOut={handleSignOut}
         onSellRent={handleSellRent}
         appName="Zakarta"
+        pathname={pathname}
       />
       <AuthModal
         isOpen={authModalOpen}
