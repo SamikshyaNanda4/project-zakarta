@@ -33,6 +33,8 @@ export function Navbar({
 }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [propOpen, setPropOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
@@ -155,17 +157,31 @@ export function Navbar({
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
-                <button className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900">
+                <button
+                  onClick={() => setPropOpen((prev) => !prev)}
+                  onFocus={() => setPropOpen(true)}
+                  onBlur={() => {
+                    setTimeout(() => setPropOpen(false), 150);
+                  }}
+                  aria-haspopup="menu"
+                  aria-expanded={propOpen}
+                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                >
                   Properties
                 </button>
 
                 {propOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-56 rounded-xl border bg-white py-2 shadow-lg z-50">
+                  <div
+                    role="menu"
+                    className="absolute left-0 top-full mt-2 w-56 rounded-xl border bg-white py-2 shadow-lg z-50"
+                  >
                     
                     <div className="absolute top-[-8px] left-0 w-full h-2" />
 
                     <a
                       href="/properties?listingType=sell"
+                      role="menuitem"
+                      tabIndex={0}
                       onClick={() => {
                         resetDropdown();
                       }}
@@ -176,6 +192,8 @@ export function Navbar({
 
                     <a
                       href="/properties?listingType=rent"
+                      role="menuitem"
+                      tabIndex={0}
                       onClick={() => {
                         resetDropdown();
                       }}
@@ -185,9 +203,11 @@ export function Navbar({
                     </a>
 
                     <a
-                      href="/properties/new"
+                      role="menuitem"
+                      tabIndex={0}
                       onClick={() => {
                         resetDropdown();
+                        onSellRent?.();
                       }}
                       className="block px-4 py-2 text-sm hover:bg-gray-100"
                     >
@@ -198,32 +218,66 @@ export function Navbar({
               </li>
 
               {/* About */}
-              <li className="relative group">
-                <button className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100">
+             <li
+                className="relative"
+                onMouseEnter={() => setAboutOpen(true)}
+                onMouseLeave={() => setTimeout(() => setAboutOpen(false), 200)}
+              >
+                <button
+                  onClick={() => setAboutOpen((prev) => !prev)}
+                  onFocus={() => setAboutOpen(true)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) {
+                      setAboutOpen(false);
+                    }
+                  }}
+                  aria-expanded={aboutOpen}
+                  className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+                >
                   About
                 </button>
-                <div className="absolute hidden group-hover:block top-full mt-2 w-48 bg-white shadow p-3 rounded">
-                  <p className="text-sm text-gray-600">
-                    Zakarta helps you find and list properties easily.
-                  </p>
-                </div>
+
+                {aboutOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-48 bg-white shadow p-3 rounded">
+                    <div className="absolute top-[-8px] left-0 w-full h-2" />
+                    <p className="text-sm text-gray-600">
+                      Zakarta helps you find and list properties easily.
+                    </p>
+                  </div>
+                )}
               </li>
 
               {/* Contact */}
-              <li className="relative group">
-                <button className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100">
+              <li
+                className="relative"
+                onMouseEnter={() => setContactOpen(true)}
+                onMouseLeave={() => setTimeout(() => setContactOpen(false), 200)}
+              >
+                <button
+                  onClick={() => setContactOpen((prev) => !prev)}
+                  onFocus={() => setContactOpen(true)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) {
+                      setContactOpen(false);
+                    }
+                  }}
+                  aria-expanded={contactOpen}
+                  className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+                >
                   Contact
                 </button>
-                <div className="absolute hidden group-hover:block top-full mt-2 w-48 bg-white shadow p-3 rounded">
-                  <p className="text-sm text-gray-600">
-                    support@zakarta.com
-                  </p>
-                </div>
+
+                {contactOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-48 bg-white shadow p-3 rounded">
+                    <div className="absolute top-[-8px] left-0 w-full h-2" />
+                    <p className="text-sm text-gray-600">
+                      support@zakarta.com
+                    </p>
+                  </div>
+                )}
               </li>
-
-            </ul>
-          </div>
-
+        </ul> 
+       </div>        
           {/* RIGHT */}
           <div className="flex items-center gap-2">
 
