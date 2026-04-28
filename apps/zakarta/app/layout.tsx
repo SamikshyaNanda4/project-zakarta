@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import { Toaster } from "sonner";
+import Footer from "@/components/footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-gray-50 antialiased font-sans">
         <NavbarWrapper />
         {children}
+        <Footer />
         <Toaster richColors position="bottom-center"  />
       </body>
     </html>
