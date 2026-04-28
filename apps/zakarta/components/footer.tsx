@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 
 const BBSR = [
@@ -74,13 +72,13 @@ export default function Footer() {
                 </h3>
 
                 {city.localities.map((loc) => (
-                  <Link
+                <Link
                     key={loc.id}
                     href={buildLink("sell", city.name, loc.id)}
-                    className="block text-sm text-muted-foreground hover:text-foreground transition"
-                  >
-                    Properties in {loc.name}
-                  </Link>
+                    className="block text-sm text-muted-foreground hover:text-foreground transition mt-2"
+                >
+                    Buy properties in {loc.name}
+                </Link>
                 ))}
               </div>
             ))}
@@ -101,13 +99,13 @@ export default function Footer() {
                 </h3>
 
                 {city.localities.map((loc) => (
-                  <Link
+                <Link
                     key={loc.id}
                     href={buildLink("rent", city.name, loc.id)}
-                    className="block text-sm text-muted-foreground hover:text-foreground transition"
-                  >
-                    Properties in {loc.name}
-                  </Link>
+                    className="block text-sm text-muted-foreground hover:text-foreground transition mt-2"
+                >
+                    Rent properties in {loc.name}
+                </Link>
                 ))}
               </div>
             ))}
