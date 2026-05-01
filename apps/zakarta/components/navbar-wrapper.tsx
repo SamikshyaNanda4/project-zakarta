@@ -10,8 +10,8 @@ import { usePathname } from "next/navigation";
 const NAV_LINKS = [
   { href: "/", label: "Properties" },
 ];
-
-const SELL_RENT_PATH = "/properties/new";
+// apps\zakarta\app\CreatePropertyFrom\CreatePropertyForm.tsx
+const SELL_RENT_PATH = "/CreatePropertyFrom";
 
 export function NavbarWrapper() {
   const { data: session } = authClient.useSession();
