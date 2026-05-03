@@ -22,6 +22,13 @@ const BHK_OPTIONS: { label: string; value: BhkOption }[] = [
 
 const AREAS: Area[] = ["Bhubaneswar", "Cuttack", "Puri"];
 
+type RecentSearch = {
+  id: string;
+  name: string;
+  area: Area;
+  type: "buy" | "rent";
+};
+
 export function HomeSearchBar() {
   const router = useRouter();
   const [listingType, setListingType] = useState<ListingType>("buy");
@@ -86,12 +93,66 @@ export function HomeSearchBar() {
     setSelectedBhk((prev) => (prev === val ? null : val));
   }
 
+function saveRecent(
+  localities: Locality[],
+  area: Area,
+  type: ListingType
+) {
+  if (typeof window === "undefined") return;
+
+  let existing: RecentSearch[] = [];
+
+try {
+  const parsed = JSON.parse(localStorage.getItem("recent_searches") || "[]");
+  if (Array.isArray(parsed)) {
+    existing = parsed;
+  }
+} catch {
+  existing = [];
+}
+
+  const newEntries: RecentSearch[] = localities.map((loc) => ({
+    id: loc.id,
+    name: loc.name,
+    area,
+    type,
+  }));
+
+  const uniqueMap = new Map<string, RecentSearch>();
+
+  [...existing, ...newEntries].forEach((item) => {
+    uniqueMap.set(item.id + "_" + item.type, item);
+  });
+
+  const grouped = new Map<string, RecentSearch[]>();
+
+  Array.from(uniqueMap.values()).forEach((item) => {
+    if (!grouped.has(item.area)) {
+      grouped.set(item.area, []);
+    }
+    grouped.get(item.area)!.push(item);
+  });
+
+  const AREA_ORDER: Area[] = ["Bhubaneswar", "Cuttack", "Puri"];
+  const final: RecentSearch[] = [];
+
+  AREA_ORDER.forEach((area) => {
+    const items = grouped.get(area);
+    if (items) {
+      final.push(...items.slice(-2));
+    }
+  });
+
+  localStorage.setItem("recent_searches", JSON.stringify(final));
+}
+
   function handleSearch() {
     const params = new URLSearchParams();
     params.set("listingType", listingType === "buy" ? "sell" : "rent");
     params.set("area", area);
     if (selectedLocalities.length > 0) {
       params.set("localityIds", selectedLocalities.map((l) => l.id).join(","));
+      saveRecent(selectedLocalities, area, listingType);
     }
     if (selectedBhk) params.set("bhk", selectedBhk);
     router.push(`/properties?${params.toString()}`);

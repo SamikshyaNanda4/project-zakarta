@@ -95,6 +95,74 @@ function formatPriceLabel(val: number, type: "sell" | "rent"): string {
   return `₹${val * 1000}`;
 }
 
+type RecentSearch = {
+  id: string;
+  name: string;
+  area: Area;
+  type: "buy" | "rent";
+};
+
+function saveRecentFromFilter(
+  localityIds: string[],
+  allLocalities: { id: string; name: string }[],
+  area: Area,
+  type: "sell" | "rent"
+) {
+  if (typeof window === "undefined") return;
+
+let existing: RecentSearch[] = [];
+
+try {
+  const parsed = JSON.parse(localStorage.getItem("recent_searches") || "[]");
+  if (Array.isArray(parsed)) {
+    existing = parsed;
+  }
+} catch {
+  existing = [];
+}
+
+  const localityObjects = localityIds
+    .map((id) => allLocalities.find((l) => l.id === id))
+    .filter(Boolean);
+
+  const newEntries: RecentSearch[] = localityObjects.map((loc) => ({
+    id: loc!.id,
+    name: loc!.name,
+    area,
+    type: type === "sell" ? "buy" : "rent",
+  }));
+
+  const uniqueMap = new Map<string, RecentSearch>();
+
+  [...existing, ...newEntries].forEach((item) => {
+    uniqueMap.set(item.id + "_" + item.type, item);
+  });
+
+  const grouped = new Map<string, RecentSearch[]>();
+
+// group by area
+Array.from(uniqueMap.values()).forEach((item) => {
+  if (!grouped.has(item.area)) {
+    grouped.set(item.area, []);
+  }
+  grouped.get(item.area)!.push(item);
+});
+
+
+const AREA_ORDER: Area[] = ["Bhubaneswar", "Cuttack", "Puri"];
+
+const final: RecentSearch[] = [];
+
+AREA_ORDER.forEach((area) => {
+  const items = grouped.get(area);
+  if (items) {
+    final.push(...items.slice(-2));
+  }
+});
+
+  localStorage.setItem("recent_searches", JSON.stringify(final));
+}
+
 export function PropertiesFilterBar({
   initialArea,
   initialListingType,
@@ -185,6 +253,15 @@ export function PropertiesFilterBar({
     const next = { ...filters, ...patch };
     setFilters(next);
     push(next);
+     // SAVE RECENT LOCALITIES HERE
+    if (patch.localityIds) {
+    saveRecentFromFilter(
+      patch.localityIds,
+      allLocalities,
+      next.area,
+      next.listingType
+    );
+  }
   }
 
   function toggleBhk(val: string) {
