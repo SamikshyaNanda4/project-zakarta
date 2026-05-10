@@ -137,7 +137,7 @@ export function InfinitePropertyList({
 
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {items.map((property) => (
           <PropertyCard
             key={property.id}

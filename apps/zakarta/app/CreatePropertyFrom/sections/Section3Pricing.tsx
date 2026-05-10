@@ -46,6 +46,8 @@ export function Section3Pricing({
   isSell,
   monthlyMaintenanceExtra,
 }: Section3PricingProps) {
+  const disableSave = Boolean(form.formState.errors.contact);
+
   return (
     <SectionCard
       number={3}
@@ -54,6 +56,7 @@ export function Section3Pricing({
       status={status}
       onExpand={onExpand}
       onSave={onSave}
+      disableSave={disableSave}
     >
       {isSell ? (
         <>
@@ -191,6 +194,7 @@ export function Section3Pricing({
                   <FormControl>
                     <Input
                       {...field}
+                      value={field.value ?? ""}
                       onChange={(e) =>
                         field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                       }
@@ -212,6 +216,7 @@ export function Section3Pricing({
                   <FormControl>
                     <Input
                       {...field}
+                      value={field.value ?? ""}
                       onChange={(e) =>
                         field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                       }
@@ -258,6 +263,7 @@ export function Section3Pricing({
                   <FormControl>
                     <Input
                       {...field}
+                      value={field.value ?? ""}
                       onChange={(e) =>
                         field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                       }
@@ -363,6 +369,7 @@ export function Section3Pricing({
               <FormControl>
                 <Input
                   {...field}
+                  value={field.value ?? ""}
                   type="date"
                   min={new Date().toISOString().split("T")[0]}
                 />
@@ -381,7 +388,13 @@ export function Section3Pricing({
                 Contact Number
               </FormLabel>
               <FormControl>
-                <Input {...field} type="tel" placeholder="+91 98765 43210" maxLength={15} />
+                <Input
+                  {...field}
+                  value={field.value ?? ""}
+                  type="tel"
+                  placeholder="9876543210"
+                  maxLength={10}
+                />
               </FormControl>
               <FormDescription>Hidden until a verified user requests it.</FormDescription>
               <FormMessage />

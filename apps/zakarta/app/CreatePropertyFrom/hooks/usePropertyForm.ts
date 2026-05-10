@@ -30,6 +30,8 @@ export function usePropertyForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema) as Resolver<FormValues>,
     defaultValues: defaultFormValues,
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
 
   const listingType = form.watch("listingType");
@@ -252,7 +254,10 @@ export function usePropertyForm() {
       toast.success("Property listed successfully!");
       setIsSuccess(true);
     } catch (err: unknown) {
-      const apiErr = err as { response?: { status?: number; data?: { error?: string } } };
+      const apiErr = err as {
+        response?: { status?: number; data?: { error?: string } };
+        message?: string;
+      };
       if (apiErr.response?.status === 401) {
         toast.error("Authentication required");
         return;
@@ -263,7 +268,10 @@ export function usePropertyForm() {
         });
         return;
       }
-      const msg = apiErr.response?.data?.error ?? "Something went wrong. Please try again.";
+      const msg =
+        apiErr.response?.data?.error ??
+        (err instanceof Error ? err.message : undefined) ??
+        "Something went wrong. Please try again.";
       toast.error("Failed to post listing", { description: msg });
     } finally {
       setIsSubmitting(false);

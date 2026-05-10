@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CurrentRentConditionSchema } from "@repo/shared/schemas";
 
 // ─────────────────────────────────────────────
 // FORM SCHEMA
@@ -15,13 +16,24 @@ export const FormSchema = z.object({
   apartmentName: z.string().optional(),
   bhk: z.string().min(1, "Select BHK"),
   ownershipType: z.string().optional(),
-  builtUpArea: z.number().int().min(1, "Enter built-up area").optional(),
-  carpetArea: z.number().int().min(1, "Enter carpet area").optional(),
+  builtUpArea: z.number({ invalid_type_error: "Enter built-up area" })
+    .int()
+    .min(1, "Enter built-up area")
+    .optional(),
+  carpetArea: z.number({ invalid_type_error: "Enter carpet area" })
+    .int()
+    .min(1, "Enter carpet area")
+    .optional(),
   propertyAge: z.string().min(1, "Select property age"),
   facing: z.string().optional(),
   floorType: z.string().min(1, "Select floor type"),
-  floorNumber: z.number().int().optional(),
-  totalFloors: z.number().int().min(1, "Enter total floors"),
+  floorNumber: z.number({ invalid_type_error: "Enter floor number" })
+    .int()
+    .min(1, "Floor number must be at least 1")
+    .optional(),
+  totalFloors: z.number({ required_error: "Enter total floors", invalid_type_error: "Enter total floors" })
+    .int()
+    .min(1, "Enter total floors"),
   availableForLease: z.boolean().optional(),
   // Section 3 — sell
   expectedPrice: z.number().optional(),
@@ -31,7 +43,11 @@ export const FormSchema = z.object({
   kitchenType: z.string().optional(),
   furnishedStatus: z.string().optional(),
   parking: z.string().optional(),
-  contact: z.string().min(10, "Enter valid contact").max(15),
+  contact: z
+    .string()
+    .min(10, "Enter a valid contact number")
+    .max(10, "Contact number must be 10 digits")
+    .regex(/^[0-9]{10}$/, "Enter a valid 10-digit contact number"),
   // Section 3 — rent
   expectedRent: z.number().optional(),
   expectedDeposit: z.number().optional(),
@@ -65,7 +81,7 @@ export const FormSchema = z.object({
   petAllowed: z.boolean().default(false),
   nonVegAllowed: z.boolean().default(false),
   gatedSecurity: z.boolean().default(false),
-  currentCondition: z.string().optional(),
+  currentCondition: CurrentRentConditionSchema.optional(),
   directionDescription: z.string().max(1000).optional(),
   ac: z.boolean().default(false),
   rainwaterHarvesting: z.boolean().default(false),
@@ -81,6 +97,37 @@ export const FormSchema = z.object({
   availabilityPeriod: z.string().optional(),
   availabilityStartTime: z.string().optional(),
   availabilityEndTime: z.string().optional(),
+})
+.superRefine((data, ctx) => {
+  const apartmentTypes = ["apartment", "gated_community_villa"];
+
+  if (apartmentTypes.includes(data.homeType)) {
+    if (data.floorNumber === undefined || data.floorNumber === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["floorNumber"],
+        message: "Floor number is required for apartments and gated communities",
+      });
+    }
+  }
+
+  if (data.floorNumber !== undefined && data.totalFloors !== undefined) {
+    if (data.floorNumber > data.totalFloors) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["floorNumber"],
+        message: "Floor number cannot exceed total floors",
+      });
+    }
+  }
+
+  if (data.listingType === "rent" && !data.currentCondition) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["currentCondition"],
+      message: "Select current property condition",
+    });
+  }
 });
 
 export type FormValues = z.infer<typeof FormSchema>;
@@ -124,6 +171,7 @@ export function getSection2Fields(isSell: boolean): (keyof FormValues)[] {
     "bhk",
     "propertyAge",
     "floorType",
+    "floorNumber",
     "totalFloors",
     ...(isSell ? (["builtUpArea", "carpetArea", "ownershipType"] as (keyof FormValues)[]) : []),
   ];
@@ -144,7 +192,7 @@ export const section3FieldsRent: (keyof FormValues)[] = [
   "preferredTenants",
 ];
 
-export const section4Fields: (keyof FormValues)[] = ["bathrooms", "whoShows"];
+export const section4Fields: (keyof FormValues)[] = ["bathrooms", "whoShows", "currentCondition"];
 
 export function getSection5Fields(isSell: boolean): (keyof FormValues)[] {
   return isSell
@@ -174,6 +222,7 @@ export const defaultFormValues: Partial<FormValues> = {
   ownershipType: "self",
   propertyAge: "",
   floorType: "",
+  floorNumber: 1,
   totalFloors: 1,
   availableForLease: true,
   availableFrom: "",

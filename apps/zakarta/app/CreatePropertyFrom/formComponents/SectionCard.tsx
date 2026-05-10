@@ -12,6 +12,7 @@ interface SectionCardProps {
   onExpand: () => void;
   onSave: () => void;
   saving?: boolean;
+  disableSave?: boolean;
   children: React.ReactNode;
 }
 
@@ -23,6 +24,7 @@ export function SectionCard({
   onExpand,
   onSave,
   saving,
+  disableSave,
   children,
 }: SectionCardProps) {
   const isOpen = status === "active";
@@ -83,7 +85,7 @@ export function SectionCard({
               <Button
                 type="button"
                 onClick={onSave}
-                disabled={saving}
+                disabled={saving || disableSave}
                 className="bg-emerald-600 hover:bg-emerald-700 min-w-[130px]"
               >
                 {saving ? (

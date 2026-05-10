@@ -26,8 +26,18 @@ export function createHttpClient(baseURL: string) {
     (response) => response,
     (err: unknown) => {
       if (isAxiosError(err) && err.response) {
-        const body = err.response.data as { error?: string } | undefined;
-        const message = body?.error ?? err.message ?? "Request failed";
+        const body = err.response.data as { error?: unknown } | undefined;
+        let message: string;
+
+        if (typeof body?.error === "string") {
+          message = body.error;
+        } else if (body?.error && typeof body.error === "object") {
+          const maybeMessage = (body.error as { message?: string }).message;
+          message = typeof maybeMessage === "string" ? maybeMessage : JSON.stringify(body.error);
+        } else {
+          message = err.message ?? "Request failed";
+        }
+
         return Promise.reject(new Error(message));
       }
       return Promise.reject(err);

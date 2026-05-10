@@ -118,7 +118,12 @@ export function Section2About({
                 <span className="ml-1 text-xs text-muted-foreground">(optional)</span>
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="e.g. Prestige Garden" maxLength={100} />
+                <Input
+                  {...field}
+                  value={field.value ?? ""}
+                  placeholder="e.g. Prestige Garden"
+                  maxLength={100}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -215,6 +220,7 @@ export function Section2About({
                 <FormControl>
                   <Input
                     {...field}
+                    value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                     }
@@ -236,6 +242,7 @@ export function Section2About({
                 <FormControl>
                   <Input
                     {...field}
+                    value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                     }
@@ -284,12 +291,14 @@ export function Section2About({
                 <FormControl>
                   <Input
                     {...field}
+                    value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                     }
                     type="number"
                     placeholder="3"
-                    min={0}
+                    min={1}
+                    max={form.getValues("totalFloors") || undefined}
                   />
                 </FormControl>
                 <FormMessage />
@@ -307,6 +316,7 @@ export function Section2About({
               <FormControl>
                 <Input
                   {...field}
+                  value={field.value ?? ""}
                   onChange={(e) =>
                     field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                   }

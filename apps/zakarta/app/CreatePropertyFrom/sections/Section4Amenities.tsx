@@ -108,6 +108,7 @@ export function Section4Amenities({
               <FormControl>
                 <Input
                   {...field}
+                  value={field.value ?? ""}
                   onChange={(e) =>
                     field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                   }
@@ -132,6 +133,7 @@ export function Section4Amenities({
                 <FormControl>
                   <Input
                     {...field}
+                    value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                     }
@@ -155,6 +157,7 @@ export function Section4Amenities({
                 <FormControl>
                   <Input
                     {...field}
+                    value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
                     }

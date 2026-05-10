@@ -175,6 +175,15 @@ export const SellAboutSectionSchema = z
       return true;
     },
     { message: "Floor number is required for apartments and gated communities", path: ["floorNumber"] }
+  )
+  .refine(
+    (d) => {
+      if (d.floorNumber !== undefined && d.floorNumber !== null) {
+        return d.floorNumber <= d.totalFloors;
+      }
+      return true;
+    },
+    { message: "Floor number cannot exceed total floors", path: ["floorNumber"] }
   );
 
 export const SellDetailsSectionSchema = z.object({
@@ -190,7 +199,8 @@ export const SellDetailsSectionSchema = z.object({
   contact: z
     .string()
     .min(10, "Enter a valid contact number")
-    .max(15, "Contact number is too long"),
+    .max(15, "Contact number is too long")
+    .regex(/^[+]?\d[\d ]{8,13}$/, "Enter a valid contact number"),
 });
 
 export const SellAmenitiesSectionSchema = z.object({
@@ -282,6 +292,15 @@ export const RentAboutSectionSchema = z
       return true;
     },
     { message: "Floor number is required for apartments", path: ["floorNumber"] }
+  )
+  .refine(
+    (d) => {
+      if (d.floorNumber !== undefined && d.floorNumber !== null) {
+        return d.floorNumber <= d.totalFloors;
+      }
+      return true;
+    },
+    { message: "Floor number cannot exceed total floors", path: ["floorNumber"] }
   );
 
 export const RentDetailsSectionSchema = z.object({
@@ -301,7 +320,8 @@ export const RentDetailsSectionSchema = z.object({
   contact: z
     .string()
     .min(10, "Enter a valid contact number")
-    .max(15, "Contact number is too long"),
+    .max(15, "Contact number is too long")
+    .regex(/^[+]?\d[\d ]{8,13}$/, "Enter a valid contact number"),
 }).refine(
   (d) => {
     if (d.monthlyMaintenanceExtra) {
