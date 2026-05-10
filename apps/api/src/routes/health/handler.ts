@@ -6,3 +6,5 @@ export function HealthRoutes(app: OpenAPIHono) {
     return c.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 }
+
+//healthHandler

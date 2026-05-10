@@ -18,4 +18,5 @@ export type {
 export { http } from "./http";
 
 // Resource objects (client components only)
+
 export { properties, localities } from "./resources/properties";

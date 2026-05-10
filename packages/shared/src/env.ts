@@ -9,6 +9,9 @@ config({ path: resolve(process.cwd(), "../../.env") });
 const envSchema = z.object({
   // Database
   DATABASE_URL: z.string(),
+  VALID_URL: z.url().optional(),
+  FRONTEND_URL: z.url(),
+  BACKEND_URL: z.url(),
 
   // Server (optional with defaults)
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
@@ -18,7 +21,7 @@ const envSchema = z.object({
   // Better Auth
   BETTER_AUTH_SECRET: z
     .string()
-    .min(20, "BETTER_AUTH_SECRET must be at least 32 characters"),
+    .min(20, "BETTER_AUTH_SECRET must be at least 20 characters"),
   BETTER_AUTH_URL: z.url("BETTER_AUTH_URL must be a valid URL"),
 });
 

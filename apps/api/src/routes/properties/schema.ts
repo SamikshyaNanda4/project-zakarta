@@ -103,7 +103,12 @@ export const CreateSellPropertyBodySchema = z
       .min(5)
       .max(120)
       .openapi({ example: "Spacious 2BHK in Patia" }),
-    contact: z.string().min(10).max(15).openapi({ example: "+91 98765 43210" }),
+    contact: z
+      .string()
+      .min(10)
+      .max(10)
+      .regex(/^[0-9]{10}$/, "Enter a valid 10-digit contact number")
+      .openapi({ example: "9876543210" }),
     localityId: z.string().min(1),
     // About
     homeType: z.enum([
@@ -193,6 +198,24 @@ export const CreateSellPropertyBodySchema = z
     // Photos
     photos: z.array(PhotoInputSchema).max(6).optional(),
   })
+  .refine(
+    (d) => {
+      if (d.homeType === "apartment" || d.homeType === "gated_community_villa") {
+        return d.floorNumber !== undefined && d.floorNumber !== null;
+      }
+      return true;
+    },
+    { message: "Floor number is required for apartments and gated communities", path: ["floorNumber"] }
+  )
+  .refine(
+    (d) => {
+      if (d.floorNumber !== undefined && d.floorNumber !== null) {
+        return d.floorNumber <= d.totalFloors;
+      }
+      return true;
+    },
+    { message: "Floor number cannot exceed total floors", path: ["floorNumber"] }
+  )
   .openapi("CreateSellPropertyBody");
 
 export const CreateRentPropertyBodySchema = z
@@ -203,7 +226,12 @@ export const CreateRentPropertyBodySchema = z
       .min(5)
       .max(120)
       .openapi({ example: "2BHK for rent in Sailashree Vihar" }),
-    contact: z.string().min(10).max(15).openapi({ example: "+91 98765 43210" }),
+    contact: z
+      .string()
+      .min(10)
+      .max(10)
+      .regex(/^[0-9]{10}$/, "Enter a valid 10-digit contact number")
+      .openapi({ example: "9876543210" }),
     localityId: z.string().min(1),
     // About
     homeType: z.enum([
@@ -283,6 +311,24 @@ export const CreateRentPropertyBodySchema = z
     // Photos
     photos: z.array(PhotoInputSchema).max(5).optional(),
   })
+  .refine(
+    (d) => {
+      if (d.homeType === "apartment") {
+        return d.floorNumber !== undefined && d.floorNumber !== null;
+      }
+      return true;
+    },
+    { message: "Floor number is required for apartments", path: ["floorNumber"] }
+  )
+  .refine(
+    (d) => {
+      if (d.floorNumber !== undefined && d.floorNumber !== null) {
+        return d.floorNumber <= d.totalFloors;
+      }
+      return true;
+    },
+    { message: "Floor number cannot exceed total floors", path: ["floorNumber"] }
+  )
   .openapi("CreateRentPropertyBody");
 
 export const CreatePropertyBodySchema = z
