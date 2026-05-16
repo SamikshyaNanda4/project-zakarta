@@ -160,7 +160,17 @@ const FormSchema = z.object({
   availabilityPeriod: z.string().optional(),
   availabilityStartTime: z.string().optional(),
   availabilityEndTime: z.string().optional(),
+  photos: z
+  .array(
+    z.object({
+      url: z.string(),
+      order: z.number(),
+    })
+  )
+  .optional(),
 });
+
+
 
 type FormValues = z.infer<typeof FormSchema>;
 
@@ -432,6 +442,7 @@ export function CreatePropertyForm() {
       houseKeeping: false,
       washingMachine: false,
       laundry: false,
+      photos: [],
     },
   });
 
@@ -452,6 +463,9 @@ export function CreatePropertyForm() {
   const [localityList, setLocalityList] = useState<Locality[]>([]);
   const [loadingLocalities, setLoadingLocalities] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadedPhotos, setUploadedPhotos] = useState<
+  { url: string; order: number }[]
+>([]);
   const [isSuccess, setIsSuccess] = useState(false);
 
   // Fetch localities when area changes
@@ -506,6 +520,30 @@ export function CreatePropertyForm() {
   }, []);
 
   const isSell = listingType === "sell";
+  async function handlePhotoUpload(
+  e: React.ChangeEvent<HTMLInputElement>
+) {
+  const files = e.target.files;
+  if (!files) return;
+
+  const uploaded: { url: string; order: number }[] = [];
+
+ for (let i = 0; i < files.length; i++) {
+  const file = files.item(i);
+
+  if (!file) continue;
+
+  const url = URL.createObjectURL(file);
+
+  uploaded.push({
+    url,
+    order: i + 1,
+  });
+}
+
+  setUploadedPhotos(uploaded);
+  form.setValue("photos", uploaded);
+}
 
   const totalSections = isSell ? 6 : 5;
 
@@ -603,6 +641,7 @@ export function CreatePropertyForm() {
           availabilityPeriod: values.availabilityPeriod as CreateSellPropertyBody["availabilityPeriod"],
           availabilityStartTime: values.availabilityStartTime,
           availabilityEndTime: values.availabilityEndTime,
+          // photos: values.photos ?? [],
         };
         await properties.create(body);
       } else {
@@ -657,7 +696,9 @@ export function CreatePropertyForm() {
             powerBackup: values.powerBackup === "full" || values.powerBackup === "partial",
             washingMachine: values.washingMachine,
             laundry: values.laundry,
+            
           },
+          // photos: values.photos ?? [],
         };
         await properties.create(body);
       }
@@ -1891,7 +1932,34 @@ export function CreatePropertyForm() {
               Your contact stays hidden until a verified user requests it.
             </p>
           </div>
+<Card>
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Camera className="h-5 w-5" />
+      Property Photos
+    </CardTitle>
+  </CardHeader>
 
+  <CardContent className="space-y-4">
+    <Input
+      type="file"
+      multiple
+      accept="image/*"
+      onChange={handlePhotoUpload}
+    />
+
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      {uploadedPhotos.map((photo) => (
+        <img
+          key={photo.order}
+          src={photo.url}
+          alt=""
+          className="h-32 w-full rounded-lg object-cover border"
+        />
+      ))}
+    </div>
+  </CardContent>
+</Card>
         </form>
       </Form>
     </div>

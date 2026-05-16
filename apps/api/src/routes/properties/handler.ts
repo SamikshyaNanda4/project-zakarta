@@ -31,11 +31,13 @@ function generateId(prefix: string): string {
 }
 
 function buildPublicProperty(
+  
   row: typeof property.$inferSelect,
   loc: { name: string; area: string },
   sellRow: typeof propertySell.$inferSelect | null,
   rentRow: typeof propertyRent.$inferSelect | null,
-  photos: Array<{ url: string; order: number }>
+  photos: Array<{ url: string; order: number }>,
+  amenities: Array<typeof sellAmenity.$inferSelect | typeof rentAmenity.$inferSelect> = []
 ) {
   return {
     id: row.id,
@@ -52,7 +54,19 @@ function buildPublicProperty(
     expectedRent: rentRow?.expectedRent ?? null,
     description: sellRow?.description ?? rentRow?.description ?? null,
     homeType: sellRow?.homeType ?? rentRow?.homeType ?? null,
+    availableFrom: sellRow?.availableFrom ?? rentRow?.availableFrom ?? null,
+
+directionDescription:
+  rentRow?.directionDescription ?? null,
     photos,
+    amenities:
+  amenities
+    ?.filter((a) =>
+      typeof a.value === "boolean"
+        ? a.value
+        : a.value === "yes"
+    )
+    .map((a) => a.name) ?? [],
   };
 }
 
@@ -99,12 +113,23 @@ export function PropertyRoutes(app: OpenAPIHono) {
     const rows = await db.query.property.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
       orderBy: (p, { desc }) => [desc(p.createdAt)],
-      with: {
-        locality: true,
-        sellDetails: true,
-        rentDetails: true,
-        photos: true,
-      },
+     with: {
+  locality: true,
+
+  sellDetails: {
+    with: {
+      amenities: true   
+    }
+  },
+  
+
+  rentDetails: {
+  with: {
+    amenities: true
+  }
+},
+  photos: true,
+},
     });
 
     // In-memory filters for fields on sell/rent detail tables
@@ -175,7 +200,12 @@ export function PropertyRoutes(app: OpenAPIHono) {
         { name: r.locality.name, area: r.locality.area },
         r.sellDetails ?? null,
         r.rentDetails ?? null,
-        r.photos.map((p) => ({ url: p.url, order: p.order }))
+        r.photos.map((p) => ({ url: p.url, order: p.order })),
+        [
+  ...(r.sellDetails?.amenities ?? []),
+  ...(r.rentDetails?.amenities ?? []),
+]
+        
       )
     );
 
@@ -186,28 +216,43 @@ export function PropertyRoutes(app: OpenAPIHono) {
   app.openapi(getPropertyRoute, async (c) => {
     const { id } = c.req.valid("param");
 
-    const row = await db.query.property.findFirst({
-      where: eq(property.id, id),
+   const row = await db.query.property.findFirst({
+  where: eq(property.id, id),
+  with: {
+    locality: true,
+
+    photos: true,
+
+    sellDetails: {
       with: {
-        locality: true,
-        sellDetails: true,
-        rentDetails: true,
-        photos: true,
-      },
-    });
+        amenities: true
+      }
+    },
+
+    rentDetails: {
+      with: {
+        amenities: true   // 👈 ADD THIS (IMPORTANT)
+      }
+    },
+  },
+});
 
     if (!row) return c.json({ error: "Property not found" }, 404);
 
     return c.json(
-      buildPublicProperty(
-        row,
-        { name: row.locality.name, area: row.locality.area },
-        row.sellDetails ?? null,
-        row.rentDetails ?? null,
-        row.photos.map((p) => ({ url: p.url, order: p.order }))
-      ),
-      200
-    );
+  buildPublicProperty(
+    row,
+    { name: row.locality.name, area: row.locality.area },
+    row.sellDetails ?? null,
+    row.rentDetails ?? null,
+    row.photos.map((p) => ({ url: p.url, order: p.order })),
+    [
+      ...(row.sellDetails?.amenities ?? []),
+      ...(row.rentDetails?.amenities ?? []),
+    ]
+  ),
+  200
+);
   });
 
   // ── POST /properties (protected) ─────────────────────────────────────────────
@@ -420,16 +465,16 @@ export function PropertyRoutes(app: OpenAPIHono) {
     }
 
     // Insert photos if provided
-    if (body.photos?.length) {
-      const photoRows = body.photos.map((p) => ({
-        id: generateId("photo"),
-        propertyId,
-        url: p.url,
-        order: p.order,
-        createdAt: new Date(),
-      }));
-      await db.insert(propertyPhoto).values(photoRows);
-    }
+    // if (body.photos?.length) {
+    //   const photoRows = body.photos.map((p) => ({
+    //     id: generateId("photo"),
+    //     propertyId,
+    //     url: p.url,
+    //     order: p.order,
+    //     createdAt: new Date(),
+    //   }));
+    //   await db.insert(propertyPhoto).values(photoRows);
+    // }
 
     return c.json(
       buildPublicProperty(
@@ -437,7 +482,8 @@ export function PropertyRoutes(app: OpenAPIHono) {
         { name: localityRow.name, area: localityRow.area },
         sellRow,
         rentRow,
-        (body.photos ?? []).map((p) => ({ url: p.url, order: p.order }))
+        (body.photos ?? []).map((p) => ({ url: p.url, order: p.order })),
+        []
       ),
       201
     );

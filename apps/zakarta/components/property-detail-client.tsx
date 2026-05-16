@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -17,6 +16,43 @@ import type { PropertyPublic } from "@/api";
 import { properties } from "@/api";
 import { authClient } from "@/lib/auth-client";
 import { AuthModal } from "./auth-modal";
+
+
+
+
+const amenityConfig: Record<string, { label: string; icon: string }> = {
+  gym: { label: "Gym", icon: "/icons/gym.svg" },
+  lift: { label: "Lift", icon: "/icons/lift.svg" },
+  shoppingCenter: { label: "Shopping Center", icon: "/icons/shoppingcenter.svg" },
+
+  powerBackup: { label: "Power Backup", icon: "/icons/power.svg" }, // ⚠️ NOTE: file missing (see below)
+
+  gatedSociety: { label: "Gated Society", icon: "/icons/gated.svg" },
+  clubHouse: { label: "Club House", icon: "/icons/club.svg" },
+  intercom: { label: "Intercom", icon: "/icons/intercom.svg" },
+
+  sewageTreatment: { label: "Sewage Treatment", icon: "/icons/sewage.svg" },
+  gasPipeline: { label: "Gas Pipeline", icon: "/icons/gas.svg" },
+  swimmingPool: { label: "Swimming Pool", icon: "/icons/pool.svg" },
+  fireSafety: { label: "Fire Safety", icon: "/icons/fire.svg" },
+
+  childrenPlayArea: { label: "Play Area", icon: "/icons/playarea.svg" },
+  park: { label: "Park", icon: "/icons/park.svg" },
+
+  visitorParking: { label: "Visitor Parking", icon: "/icons/parking.svg" },
+  internetServices: { label: "Internet Services", icon: "/icons/internet.svg" },
+
+  // EXTRA icons (jo tumhare folder me hai but use nahi ho rahe the)
+  ac: { label: "Air Conditioning", icon: "/icons/ac.svg" },
+  garden: { label: "Garden", icon: "/icons/garden.svg" },
+  houseKeeping: { label: "Housekeeping", icon: "/icons/housekeeping.svg" },
+  laundry: { label: "Laundry", icon: "/icons/laundry.svg" },
+  meat: { label: "Non-Veg Allowed", icon: "/icons/meat.svg" },
+  pet: { label: "Pet Friendly", icon: "/icons/pet.svg" },
+  rainwaterHarvesting: { label: "Rainwater Harvesting", icon: "/icons/rainwater.svg" },
+  washingMachine: { label: "Washing Machine", icon: "/icons/washingmachine.svg" },
+  
+};
 
 type Props = {
   property: PropertyPublic;
@@ -95,7 +131,9 @@ export function PropertyDetailClient({ property }: Props) {
 
   const price = isSell ? property.expectedPrice : property.expectedRent;
   const sortedPhotos = [...(property.photos ?? [])].sort((a, b) => a.order - b.order);
-
+const [selectedPhoto, setSelectedPhoto] = useState(
+  sortedPhotos[0]?.url
+);
   return (
     <>
       <Link
@@ -108,24 +146,41 @@ export function PropertyDetailClient({ property }: Props) {
 
       <article className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
 
-        {/* Photo gallery */}
-        {sortedPhotos.length > 0 ? (
-          <div className="grid gap-1 grid-cols-2 sm:grid-cols-3 h-64 overflow-hidden">
-            {sortedPhotos.slice(0, 6).map((photo, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={i}
-                src={photo.url}
-                alt={`${property.title} photo ${i + 1}`}
-                className={`h-full w-full object-cover ${i === 0 ? "col-span-2 row-span-2" : ""}`}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex h-56 w-full items-center justify-center bg-gray-100">
-            <ImageOff className="h-12 w-12 text-gray-300" />
-          </div>
-        )}
+{/* Photo gallery */}
+{sortedPhotos.length > 0 ? (
+  <div className="relative h-[420px] w-full overflow-hidden bg-gray-100">
+
+    {/* Main Image */}
+    <img
+      src={selectedPhoto}
+      alt={property.title}
+      className="h-full w-full object-cover"
+    />
+
+    {/* Thumbnail Strip */}
+    {sortedPhotos.length > 1 && (
+      <div className="absolute bottom-4 left-4 flex gap-2 overflow-x-auto rounded-xl bg-black/40 p-2 backdrop-blur-sm">
+        {sortedPhotos.slice(0, 6).map((photo, i) => (
+          <img
+  key={i}
+  src={photo.url}
+  alt={`Thumbnail ${i + 1}`}
+  onClick={() => setSelectedPhoto(photo.url)}
+  className={`h-16 w-24 cursor-pointer rounded-md object-cover border-2 transition-all ${
+    selectedPhoto === photo.url
+      ? "border-white scale-105"
+      : "border-transparent opacity-80 hover:opacity-100"
+  }`}
+/>
+        ))}
+      </div>
+    )}
+  </div>
+) : (
+  <div className="flex h-56 w-full items-center justify-center bg-gray-100">
+    <ImageOff className="h-12 w-12 text-gray-300" />
+  </div>
+)}
 
         <div className="p-6 sm:p-8">
           {/* Header */}
@@ -182,17 +237,108 @@ export function PropertyDetailClient({ property }: Props) {
             />
           </div>
 
-          {/* Description */}
-          {property.description && (
-            <div className="mb-6">
-              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-400">
-                Description
-              </h2>
-              <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
-                {property.description}
-              </p>
-            </div>
-          )}
+{/* Description */}
+{property.description && (
+  <div className="mb-6">
+
+    {/* Header + Share button */}
+    <div className="mb-2 flex items-center gap-2">
+
+      <button
+        className="text-xs text-indigo-600 hover:underline"
+        onClick={() => {
+          if (navigator.share) {
+            navigator.share({
+              title: property.title,
+              url: window.location.href,
+            });
+          } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Link copied!");
+          }
+        }}
+      >
+        🔗 Share
+      </button>
+
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
+        Description
+      </h2>
+
+    </div>
+
+    <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
+      {property.description}
+    </p>
+  </div>
+)}
+
+
+{/* Available From */}
+{property.availableFrom && (
+  <div className="mb-4">
+    <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-400">
+      Available From
+    </h2>
+
+    <p className="text-sm text-gray-700">
+      {new Date(property.availableFrom).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })}
+    </p>
+  </div>
+)}
+
+{/* Direction Description */}
+{property.directionDescription && (
+  <div className="mb-6">
+    <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-400">
+      Direction Description
+    </h2>
+
+    <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
+      {property.directionDescription}
+    </p>
+  </div>
+)}
+
+
+{/* Amenities */}
+{property.amenities && property.amenities.length > 0 && (
+  <div className="mb-6">
+    <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">
+      Amenities
+    </h2>
+
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      {property.amenities.map((amenity) => {
+        const config = amenityConfig[amenity];
+
+        return (
+          <div
+            key={amenity}
+            className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 hover:bg-gray-50 transition"
+          >
+            {config?.icon && (
+              <img
+                src={config.icon}
+                alt={config.label}
+                className="h-4 w-4 object-contain"
+              />
+            )}
+            <span className="text-xs font-medium text-gray-700">
+              {config?.label ?? amenity}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
+
+
 
           {/* Contact section */}
           <div className="rounded-xl border border-gray-100 bg-gray-50 p-5">
