@@ -1,4 +1,25 @@
 "use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Phone,
+  BedDouble,
+  Building2,
+  ArrowLeft,
+  MapPin,
+  IndianRupee,
+  CalendarDays,
+  ImageOff,
+} from "lucide-react";
+import Link from "next/link";
+import type { PropertyPublic } from "@/api";
+import { properties } from "@/api";
+import { authClient } from "@/lib/auth-client";
+import { AuthModal } from "./auth-modal";
+
+
+
+
 const amenityConfig: Record<string, { label: string; icon: string }> = {
   gym: { label: "Gym", icon: "/icons/gym.svg" },
   lift: { label: "Lift", icon: "/icons/lift.svg" },
@@ -30,28 +51,8 @@ const amenityConfig: Record<string, { label: string; icon: string }> = {
   pet: { label: "Pet Friendly", icon: "/icons/pet.svg" },
   rainwaterHarvesting: { label: "Rainwater Harvesting", icon: "/icons/rainwater.svg" },
   washingMachine: { label: "Washing Machine", icon: "/icons/washingmachine.svg" },
+  
 };
-
-
-
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Phone,
-  BedDouble,
-  Building2,
-  ArrowLeft,
-  MapPin,
-  IndianRupee,
-  CalendarDays,
-  ImageOff,
-} from "lucide-react";
-import Link from "next/link";
-import type { PropertyPublic } from "@/api";
-import { properties } from "@/api";
-import { authClient } from "@/lib/auth-client";
-import { AuthModal } from "./auth-modal";
 
 type Props = {
   property: PropertyPublic;
@@ -130,7 +131,9 @@ export function PropertyDetailClient({ property }: Props) {
 
   const price = isSell ? property.expectedPrice : property.expectedRent;
   const sortedPhotos = [...(property.photos ?? [])].sort((a, b) => a.order - b.order);
-
+const [selectedPhoto, setSelectedPhoto] = useState(
+  sortedPhotos[0]?.url
+);
   return (
     <>
       <Link
@@ -143,24 +146,41 @@ export function PropertyDetailClient({ property }: Props) {
 
       <article className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
 
-        {/* Photo gallery */}
-        {sortedPhotos.length > 0 ? (
-          <div className="grid gap-1 grid-cols-2 sm:grid-cols-3 h-64 overflow-hidden">
-            {sortedPhotos.slice(0, 6).map((photo, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={i}
-                src={photo.url}
-                alt={`${property.title} photo ${i + 1}`}
-                className={`h-full w-full object-cover ${i === 0 ? "col-span-2 row-span-2" : ""}`}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex h-56 w-full items-center justify-center bg-gray-100">
-            <ImageOff className="h-12 w-12 text-gray-300" />
-          </div>
-        )}
+{/* Photo gallery */}
+{sortedPhotos.length > 0 ? (
+  <div className="relative h-[420px] w-full overflow-hidden bg-gray-100">
+
+    {/* Main Image */}
+    <img
+      src={selectedPhoto}
+      alt={property.title}
+      className="h-full w-full object-cover"
+    />
+
+    {/* Thumbnail Strip */}
+    {sortedPhotos.length > 1 && (
+      <div className="absolute bottom-4 left-4 flex gap-2 overflow-x-auto rounded-xl bg-black/40 p-2 backdrop-blur-sm">
+        {sortedPhotos.slice(0, 6).map((photo, i) => (
+          <img
+  key={i}
+  src={photo.url}
+  alt={`Thumbnail ${i + 1}`}
+  onClick={() => setSelectedPhoto(photo.url)}
+  className={`h-16 w-24 cursor-pointer rounded-md object-cover border-2 transition-all ${
+    selectedPhoto === photo.url
+      ? "border-white scale-105"
+      : "border-transparent opacity-80 hover:opacity-100"
+  }`}
+/>
+        ))}
+      </div>
+    )}
+  </div>
+) : (
+  <div className="flex h-56 w-full items-center justify-center bg-gray-100">
+    <ImageOff className="h-12 w-12 text-gray-300" />
+  </div>
+)}
 
         <div className="p-6 sm:p-8">
           {/* Header */}
@@ -249,6 +269,37 @@ export function PropertyDetailClient({ property }: Props) {
 
     <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
       {property.description}
+    </p>
+  </div>
+)}
+
+
+{/* Available From */}
+{property.availableFrom && (
+  <div className="mb-4">
+    <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-400">
+      Available From
+    </h2>
+
+    <p className="text-sm text-gray-700">
+      {new Date(property.availableFrom).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })}
+    </p>
+  </div>
+)}
+
+{/* Direction Description */}
+{property.directionDescription && (
+  <div className="mb-6">
+    <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-400">
+      Direction Description
+    </h2>
+
+    <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-line">
+      {property.directionDescription}
     </p>
   </div>
 )}

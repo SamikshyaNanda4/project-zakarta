@@ -54,6 +54,10 @@ function buildPublicProperty(
     expectedRent: rentRow?.expectedRent ?? null,
     description: sellRow?.description ?? rentRow?.description ?? null,
     homeType: sellRow?.homeType ?? rentRow?.homeType ?? null,
+    availableFrom: sellRow?.availableFrom ?? rentRow?.availableFrom ?? null,
+
+directionDescription:
+  rentRow?.directionDescription ?? null,
     photos,
     amenities:
   amenities
@@ -461,16 +465,16 @@ export function PropertyRoutes(app: OpenAPIHono) {
     }
 
     // Insert photos if provided
-    if (body.photos?.length) {
-      const photoRows = body.photos.map((p) => ({
-        id: generateId("photo"),
-        propertyId,
-        url: p.url,
-        order: p.order,
-        createdAt: new Date(),
-      }));
-      await db.insert(propertyPhoto).values(photoRows);
-    }
+    // if (body.photos?.length) {
+    //   const photoRows = body.photos.map((p) => ({
+    //     id: generateId("photo"),
+    //     propertyId,
+    //     url: p.url,
+    //     order: p.order,
+    //     createdAt: new Date(),
+    //   }));
+    //   await db.insert(propertyPhoto).values(photoRows);
+    // }
 
     return c.json(
       buildPublicProperty(

@@ -36,6 +36,8 @@ export const PropertyPublicSchema = z
     expectedRent: z.string().nullable().openapi({ example: null }),
     description: z.string().nullable(),
     homeType: z.string().nullable(),
+    availableFrom: z.string().nullable(),
+    directionDescription: z.string().nullable(),
     photos: z.array(z.object({ url: z.string(), order: z.number() })),
   })
   .openapi("PropertyPublic");
